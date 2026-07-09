@@ -69,7 +69,7 @@
       ".*STOCK/.*",
       "(NVDA|AAPL|AMD|ARM|ASTS|CRWV|DELL|GOOGL|IREN|LITE|MRVL|MSFT|MSTR|MU|NBIS|QCOM|SNDK|SOXL|SPCX|AAOI|AMZN|APLD|AVGO|BABA|BE|COHR|COIN|CRCL|HOOD|INTC|IONQ|META|PLTR|SQQQ|TQQQ|TSLA|TSM)/.*",
       "(CL|BZ|NATGAS|XPT)/.*",
-      "(TRIA)/.*"
+      "(TRIA|OGN)/.*"
     ],
     "ccxt_config": {
       "enableRateLimit": true,
