@@ -85,7 +85,7 @@
       "method": "VolumePairList",
       "number_assets": 80,
       "sort_key": "quoteVolume",
-      "min_value": 50000000,
+      "min_value": 15000000,
       "refresh_period": 3600
     },
     { "method": "DelistFilter", "max_days_from_now": 7 },
