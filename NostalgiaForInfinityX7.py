@@ -70,7 +70,7 @@ class NostalgiaForInfinityX7(IStrategy):
   INTERFACE_VERSION = 3
 
   def version(self) -> str:
-    return "v17.4.379"
+    return "v17.4.412"
 
   stoploss = -0.99
 
@@ -910,7 +910,7 @@ class NostalgiaForInfinityX7(IStrategy):
     # "short_entry_condition_541_enable": True,
     "short_entry_condition_542_enable": True,
     # "short_entry_condition_543_enable": True,
-    "short_entry_condition_562_enable": False,
+    "short_entry_condition_562_enable": True,
     "short_entry_condition_563_enable": False,
     # "short_entry_condition_603_enable": True,
     # "short_entry_condition_641_enable": True,
@@ -1969,21 +1969,38 @@ class NostalgiaForInfinityX7(IStrategy):
     self, pair: str, trade: "Trade", current_time: "datetime", current_rate: float, current_profit: float, **kwargs
   ):
     trade_is_short = trade.is_short
-    long_rapid_mode_tags = self.long_rapid_mode_tags
 
-    calc_total_profit = self.calc_total_profit
-    cache_backtest_profit_snapshot = self.cache_backtest_profit_snapshot
-    filled_order_snapshot = self.filled_order_snapshot
     long_normal_mode_tags = self.long_normal_mode_tags
     long_pump_mode_tags = self.long_pump_mode_tags
     long_quick_mode_tags = self.long_quick_mode_tags
     long_rebuy_mode_tags = self.long_rebuy_mode_tags
+    long_rebuy_grind_mode_tags = self.long_rebuy_grind_mode_tags
+    long_high_profit_mode_tags = self.long_high_profit_mode_tags
+    long_rapid_mode_tags = self.long_rapid_mode_tags
+    long_rapid_rebuy_grind_scalp_mode_tags = self.long_rapid_rebuy_grind_scalp_mode_tags
+    long_grind_mode_tags = self.long_grind_mode_tags
+    long_btc_mode_tags = self.long_btc_mode_tags
+    long_top_coins_mode_tags = self.long_top_coins_mode_tags
+    long_scalp_mode_tags = self.long_scalp_mode_tags
+    long_scalp_rebuy_grind_mode_tags = self.long_scalp_rebuy_grind_mode_tags
+    long_known_mode_tags = self.long_known_mode_tags
+    short_normal_mode_tags = self.short_normal_mode_tags
+    short_pump_mode_tags = self.short_pump_mode_tags
+    short_quick_mode_tags = self.short_quick_mode_tags
+    short_rebuy_mode_tags = self.short_rebuy_mode_tags
+    short_high_profit_mode_tags = self.short_high_profit_mode_tags
+    short_rapid_mode_tags = self.short_rapid_mode_tags
+    short_scalp_mode_tags = self.short_scalp_mode_tags
+    short_scalp_rebuy_grind_mode_tags = self.short_scalp_rebuy_grind_mode_tags
+    short_exit_known_mode_tags = self.short_exit_known_mode_tags
+
+    calc_total_profit = self.calc_total_profit
+    cache_backtest_profit_snapshot = self.cache_backtest_profit_snapshot
+    filled_order_snapshot = self.filled_order_snapshot
     long_exit_normal = self.long_exit_normal
     long_exit_pump = self.long_exit_pump
     long_exit_quick = self.long_exit_quick
     short_exit_normal = self.short_exit_normal
-    short_scalp_mode_tags = self.short_scalp_mode_tags
-    long_scalp_mode_tags = self.long_scalp_mode_tags
 
     df, _ = self.dp.get_analyzed_dataframe(pair, self.timeframe)
     if len(df) < 6:
@@ -2100,8 +2117,7 @@ class NostalgiaForInfinityX7(IStrategy):
 
     # Long Rebuy mode
     if all(c in long_rebuy_mode_tags for c in enter_tags) or (
-      any(c in long_rebuy_mode_tags for c in enter_tags)
-      and all(c in self.long_rebuy_grind_mode_tags for c in enter_tags)
+      any(c in long_rebuy_mode_tags for c in enter_tags) and all(c in long_rebuy_grind_mode_tags for c in enter_tags)
     ):
       sell, signal_name = self.long_exit_rebuy(
         pair,
@@ -2128,7 +2144,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Long high profit mode
-    if any(c in self.long_high_profit_mode_tags for c in enter_tags):
+    if any(c in long_high_profit_mode_tags for c in enter_tags):
       sell, signal_name = self.long_exit_high_profit(
         pair,
         current_rate,
@@ -2157,7 +2173,7 @@ class NostalgiaForInfinityX7(IStrategy):
     # Long rapid mode
     if all(c in long_rapid_mode_tags for c in enter_tags) or (
       any(c in long_rapid_mode_tags for c in enter_tags)
-      and all(c in self.long_rapid_rebuy_grind_scalp_mode_tags for c in enter_tags)
+      and all(c in long_rapid_rebuy_grind_scalp_mode_tags for c in enter_tags)
     ):
       sell, signal_name = self.long_exit_rapid(
         pair,
@@ -2184,7 +2200,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Long grind mode
-    if all(c in self.long_grind_mode_tags for c in enter_tags):
+    if all(c in long_grind_mode_tags for c in enter_tags):
       sell, signal_name = self.long_exit_grind(
         pair,
         current_rate,
@@ -2210,7 +2226,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Long btc mode
-    if all(c in self.long_btc_mode_tags for c in enter_tags):
+    if all(c in long_btc_mode_tags for c in enter_tags):
       sell, signal_name = self.long_exit_btc(
         pair,
         current_rate,
@@ -2236,7 +2252,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Long Top Coins mode
-    if any(c in self.long_top_coins_mode_tags for c in enter_tags):
+    if any(c in long_top_coins_mode_tags for c in enter_tags):
       sell, signal_name = self.long_exit_top_coins(
         pair,
         current_rate,
@@ -2265,7 +2281,7 @@ class NostalgiaForInfinityX7(IStrategy):
     # Long scalp mode
     if all(c in long_scalp_mode_tags for c in enter_tags) or (
       any(c in long_scalp_mode_tags for c in enter_tags)
-      and all(c in self.long_scalp_rebuy_grind_mode_tags for c in enter_tags)
+      and all(c in long_scalp_rebuy_grind_mode_tags for c in enter_tags)
     ):
       sell, signal_name = self.long_exit_scalp(
         pair,
@@ -2292,7 +2308,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Short normal mode
-    if any(c in self.short_normal_mode_tags for c in enter_tags):
+    if any(c in short_normal_mode_tags for c in enter_tags):
       sell, signal_name = short_exit_normal(
         pair,
         current_rate,
@@ -2319,7 +2335,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Short Pump mode
-    if any(c in self.short_pump_mode_tags for c in enter_tags):
+    if any(c in short_pump_mode_tags for c in enter_tags):
       sell, signal_name = self.short_exit_pump(
         pair,
         current_rate,
@@ -2346,7 +2362,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Short Quick mode
-    if any(c in self.short_quick_mode_tags for c in enter_tags):
+    if any(c in short_quick_mode_tags for c in enter_tags):
       sell, signal_name = self.short_exit_quick(
         pair,
         current_rate,
@@ -2373,7 +2389,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Short Rebuy mode
-    if all(c in self.short_rebuy_mode_tags for c in enter_tags):
+    if all(c in short_rebuy_mode_tags for c in enter_tags):
       sell, signal_name = self.short_exit_rebuy(
         pair,
         current_rate,
@@ -2399,7 +2415,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Short high profit mode
-    if any(c in self.short_high_profit_mode_tags for c in enter_tags):
+    if any(c in short_high_profit_mode_tags for c in enter_tags):
       sell, signal_name = self.short_exit_high_profit(
         pair,
         current_rate,
@@ -2426,7 +2442,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Short rapid mode
-    if any(c in self.short_rapid_mode_tags for c in enter_tags):
+    if any(c in short_rapid_mode_tags for c in enter_tags):
       sell, signal_name = self.short_exit_rapid(
         pair,
         current_rate,
@@ -2454,7 +2470,7 @@ class NostalgiaForInfinityX7(IStrategy):
     # Short scalp mode
     if all(c in short_scalp_mode_tags for c in enter_tags) or (
       any(c in short_scalp_mode_tags for c in enter_tags)
-      and all(c in self.short_scalp_rebuy_grind_mode_tags for c in enter_tags)
+      and all(c in short_scalp_rebuy_grind_mode_tags for c in enter_tags)
     ):
       sell, signal_name = self.short_exit_scalp(
         pair,
@@ -2481,7 +2497,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Trades not opened by X7
-    if not trade_is_short and (not any(c in self.long_known_mode_tags for c in enter_tags)):
+    if not trade_is_short and (not any(c in long_known_mode_tags for c in enter_tags)):
       # use normal mode for such trades
       sell, signal_name = long_exit_normal(
         pair,
@@ -2509,7 +2525,7 @@ class NostalgiaForInfinityX7(IStrategy):
         return f"{signal_name} ( {enter_tag})"
 
     # Trades not opened by X7
-    if trade_is_short and (not any(c in self.short_exit_known_mode_tags for c in enter_tags)):
+    if trade_is_short and (not any(c in short_exit_known_mode_tags for c in enter_tags)):
       # use normal mode for such trades
       sell, signal_name = short_exit_normal(
         pair,
@@ -13115,20 +13131,29 @@ class NostalgiaForInfinityX7(IStrategy):
     aroond_14_4h_lt_80 = aroond_14_4h < 80.0
     aroond_14_4h_lt_85 = aroond_14_4h < 85.0
     aroonu_14_gt_75 = aroonu_14 > 75.0
+    aroonu_14_15m_gt_0 = aroonu_14_15m > 0.0
+    aroonu_14_15m_gt_10 = aroonu_14_15m > 10.0
     aroonu_14_15m_gt_20 = aroonu_14_15m > 20.0
     aroonu_14_15m_gt_40 = aroonu_14_15m > 40.0
     aroonu_14_15m_gt_50 = aroonu_14_15m > 50.0
     aroonu_14_15m_gt_60 = aroonu_14_15m > 60.0
+    aroonu_14_1h_gt_0 = aroonu_14_1h > 0.0
+    aroonu_14_1h_gt_10 = aroonu_14_1h > 10.0
     aroonu_14_1h_gt_20 = aroonu_14_1h > 20.0
     aroonu_14_1h_gt_30 = aroonu_14_1h > 30.0
     aroonu_14_1h_gt_40 = aroonu_14_1h > 40.0
     aroonu_14_1h_gt_60 = aroonu_14_1h > 60.0
+    aroonu_14_4h_gt_0 = aroonu_14_4h > 0.0
     aroonu_14_4h_gt_10 = aroonu_14_4h > 10.0
     aroonu_14_4h_gt_20 = aroonu_14_4h > 20.0
     aroonu_14_4h_gt_30 = aroonu_14_4h > 30.0
     aroonu_14_4h_gt_50 = aroonu_14_4h > 50.0
     aroonu_14_4h_gt_70 = aroonu_14_4h > 70.0
     aroonu_14_4h_gt_80 = aroonu_14_4h > 80.0
+    aroonu_14_1d_gt_0 = aroonu_14_1d > 0.0
+    aroonu_14_1d_gt_10 = aroonu_14_1d > 10.0
+    aroonu_14_1d_gt_20 = aroonu_14_1d > 20.0
+    aroonu_14_1d_gt_30 = aroonu_14_1d > 30.0
     aroonu_14_1d_gt_50 = aroonu_14_1d > 50.0
     aroonu_14_lt_25 = aroonu_14 < 25.0
     aroonu_14_lt_30 = aroonu_14 < 30.0
@@ -13183,12 +13208,15 @@ class NostalgiaForInfinityX7(IStrategy):
     cmf_20_15m_gt_neg_0_35 = cmf_20_15m > -0.35
     cmf_20_15m_gt_neg_0_40 = cmf_20_15m > -0.40
     cmf_20_15m_gt_neg_0_50 = cmf_20_15m > -0.50
+    cmf_20_15m_lt_0_10 = cmf_20_15m < 0.10
+    cmf_20_15m_lt_0_20 = cmf_20_15m < 0.20
     cmf_20_15m_lt_0_30 = cmf_20_15m < 0.30
     cmf_20_1h_gt_neg_0_10 = cmf_20_1h > -0.10
     cmf_20_1h_gt_neg_0_20 = cmf_20_1h > -0.20
     cmf_20_1h_gt_neg_0_25 = cmf_20_1h > -0.25
     cmf_20_1h_gt_neg_0_30 = cmf_20_1h > -0.30
     cmf_20_1h_gt_neg_0_40 = cmf_20_1h > -0.40
+    cmf_20_1h_lt_0_10 = cmf_20_1h < 0.10
     cmf_20_1h_lt_0_20 = cmf_20_1h < 0.20
     cmf_20_1h_lt_0_30 = cmf_20_1h < 0.30
     cmf_20_4h_gt_neg_0_0 = cmf_20_4h > -0.0
@@ -13206,11 +13234,13 @@ class NostalgiaForInfinityX7(IStrategy):
     cmf_20_1d_gt_neg_0_30 = cmf_20_1d > -0.30
     cmf_20_1d_gt_neg_0_40 = cmf_20_1d > -0.40
     cmf_20_1d_gt_neg_0_50 = cmf_20_1d > -0.50
+    cmf_20_1d_lt_0_10 = cmf_20_1d < 0.10
 
     stochrsi_k_lt_20 = stochrsi_k < 20.0
     stochrsi_k_lt_30 = stochrsi_k < 30.0
     stochrsi_k_gt_80 = stochrsi_k > 80.0
-    stochrsi_k_15m_lt_20 = stochrsi_k_15m < 20.0
+    stochrsi_k_15m_gt_10 = stochrsi_k_15m > 10.0
+    stochrsi_k_15m_gt_20 = stochrsi_k_15m > 20.0
     stochrsi_k_15m_gt_30 = stochrsi_k_15m > 30.0
     stochrsi_k_15m_gt_40 = stochrsi_k_15m > 40.0
     stochrsi_k_15m_gt_60 = stochrsi_k_15m > 60.0
@@ -13224,6 +13254,7 @@ class NostalgiaForInfinityX7(IStrategy):
     stochrsi_k_4h_gt_75 = stochrsi_k_4h > 75.0
     stochrsi_k_4h_gt_80 = stochrsi_k_4h > 80.0
     stochrsi_k_4h_gt_90 = stochrsi_k_4h > 90.0
+    stochrsi_k_15m_lt_20 = stochrsi_k_15m < 20.0
     stochrsi_k_15m_lt_30 = stochrsi_k_15m < 30.0
     stochrsi_k_15m_lt_40 = stochrsi_k_15m < 40.0
     stochrsi_k_15m_lt_50 = stochrsi_k_15m < 50.0
@@ -13254,6 +13285,7 @@ class NostalgiaForInfinityX7(IStrategy):
     stochrsi_k_4h_lt_70 = stochrsi_k_4h < 70.0
     stochrsi_k_4h_lt_80 = stochrsi_k_4h < 80.0
     stochrsi_k_4h_lt_90 = stochrsi_k_4h < 90.0
+    stochrsi_k_1d_gt_10 = stochrsi_k_1d > 10.0
     stochrsi_k_1d_gt_20 = stochrsi_k_1d > 20.0
     stochrsi_k_1d_gt_30 = stochrsi_k_1d > 30.0
     stochrsi_k_1d_gt_50 = stochrsi_k_1d > 50.0
@@ -14836,6 +14868,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((rsi_3_15m_gt_35) | (stochrsi_k_1h_lt_90) | roc_9_1d_gt_neg_50)
             # 15m down move, 4h high & overbought
             & ((rsi_3_15m_gt_35) | (stochrsi_k_4h_lt_90) | (roc_9_4h_lt_20))
+            # 15m & 1h down move, 15m still high, 1h high
+            & ((rsi_3_15m_gt_40) | (rsi_3_1h_gt_55) | (aroonu_14_15m_lt_50) | (stochrsi_k_1h_lt_80))
             # 15m down move, 15m high, 1d high & overbought
             & ((rsi_3_15m_gt_40) | (aroonu_14_15m_lt_70) | (aroonu_14_1d_lt_85) | (rsi_3_1d_gt_35))
             # 15m down move, 15m high, 1h downtrend
@@ -15071,7 +15105,7 @@ class NostalgiaForInfinityX7(IStrategy):
             # 4h down move, 4h high, 1d downtrend
             & ((rsi_3_4h_gt_25) | (stochrsi_k_4h_lt_80) | roc_9_1d_gt_neg_50)
             # 4h down move, 1h high, 1h downtrend
-            & ((rsi_3_4h_gt_30) | aroonu_14_1h_lt_70 | (roc_9_1h_gt_neg_10))
+            & ((rsi_3_4h_gt_30) | (aroonu_14_1h_lt_70) | (roc_9_1h_gt_neg_10))
             # 4h & 1d down move, 1d overbought
             & ((rsi_3_4h_gt_30) | (rsi_3_1d > 50.0) | (roc_9_1d_lt_100))
             # 4h down move, 1d downtrend, 1d overbought
@@ -15083,29 +15117,29 @@ class NostalgiaForInfinityX7(IStrategy):
             # 4h down move, 1h high, 1d downtrend
             & ((rsi_3_4h_gt_30) | (stochrsi_k_1h_lt_80) | (roc_9_1d_gt_neg_40))
             # 4h down move, 1h high, 1d overbought
-            & ((rsi_3_4h_gt_30) | (stochrsi_k_1h_lt_90) | roc_9_1d_lt_50)
+            & ((rsi_3_4h_gt_30) | (stochrsi_k_1h_lt_90) | (roc_9_1d_lt_50))
             # 4h down move, 1d high & overbought
             & ((rsi_3_4h_gt_30) | (stochrsi_k_1d_lt_80) | (roc_9_1d_lt_10))
             # 4h down move, 15m still high, 1h high
             & ((rsi_3_4h_gt_35) | (aroonu_14_15m_lt_40) | (stochrsi_k_1h_lt_90))
             # 4h down move, 15m still high, 4h high
-            & ((rsi_3_4h_gt_35) | (aroonu_14_15m_lt_50) | aroonu_14_4h_lt_80)
+            & ((rsi_3_4h_gt_35) | (aroonu_14_15m_lt_50) | (aroonu_14_4h_lt_80))
             # 4h down move, 15m high, 1h high
             & ((rsi_3_4h_gt_35) | (aroonu_14_15m_lt_70) | (stochrsi_k_1h_lt_70))
             # 4h down move, 4h & 1d high
-            & ((rsi_3_4h_gt_35) | aroonu_14_4h_lt_80 | aroonu_14_1d_lt_100)
+            & ((rsi_3_4h_gt_35) | (aroonu_14_4h_lt_80) | (aroonu_14_1d_lt_100))
             # 4h down move, 1d high, 1d downtrend
             & ((rsi_3_4h_gt_35) | (stochrsi_k_1d_lt_60) | (roc_9_1d_gt_neg_30))
             # 4h down move, 1d high & overbought
             & ((rsi_3_4h_gt_35) | (stochrsi_k_1d_lt_90) | (roc_9_1d_lt_40))
             # 4h down move, 15m still high, 1d overbought
-            & ((rsi_3_4h_gt_40) | (aroonu_14_15m_lt_50) | roc_9_1d_lt_50)
+            & ((rsi_3_4h_gt_40) | (aroonu_14_15m_lt_50) | (roc_9_1d_lt_50))
             # 4h down move, 15m high, 1d overbought
             & ((rsi_3_4h_gt_40) | (aroonu_14_15m_lt_70) | (roc_9_1d_lt_200))
             # 4h down move, 1h & 4h high
-            & ((rsi_3_4h_gt_40) | aroonu_14_1h_lt_70 | aroonu_14_4h_lt_80)
+            & ((rsi_3_4h_gt_40) | (aroonu_14_1h_lt_70) | (aroonu_14_4h_lt_80))
             # 4h down move, 1d high & overbought
-            & ((rsi_3_4h_gt_40) | aroonu_14_1d_lt_100 | (roc_9_1d_lt_20))
+            & ((rsi_3_4h_gt_40) | (aroonu_14_1d_lt_100) | (roc_9_1d_lt_20))
             # 4h down move, 15m high, 1h high
             & ((rsi_3_4h_gt_40) | (stochrsi_k_15m_lt_70) | (aroonu_14_1h_lt_100))
             # 4h down move, 1h high, 1d overbought
@@ -15121,7 +15155,7 @@ class NostalgiaForInfinityX7(IStrategy):
             # 4h down move, 4h high, 1d overbought
             & ((rsi_3_4h_gt_45) | (aroonu_14_4h_lt_60) | (roc_9_1d_lt_100))
             # 4h down move, 4h high & overbought
-            & ((rsi_3_4h_gt_45) | aroonu_14_4h_lt_80 | (roc_9_4h_lt_30))
+            & ((rsi_3_4h_gt_45) | (aroonu_14_4h_lt_80) | (roc_9_4h_lt_30))
             # 4h down move, 1d high & overbought
             & ((rsi_3_4h_gt_45) | (aroonu_14_1d_lt_70) | (roc_9_1d_lt_30))
             # 4h down move, 1d high, 1d downtrend
@@ -15137,7 +15171,7 @@ class NostalgiaForInfinityX7(IStrategy):
             # 4h down move, 4h still high, 1h high
             & ((rsi_3_4h_gt_50) | (aroonu_14_4h_lt_40) | (stochrsi_k_1h_lt_70))
             # 4h down move, 4h high, 1d overbought
-            & ((rsi_3_4h_gt_50) | aroonu_14_4h_lt_70 | (roc_9_1d_lt_40))
+            & ((rsi_3_4h_gt_50) | (aroonu_14_4h_lt_70) | (roc_9_1d_lt_40))
             # 4h down move, 1d high & overbought
             & ((rsi_3_4h_gt_50) | (aroonu_14_1d_lt_85) | (roc_9_1d_lt_80))
             # 4h down move, 1d high, 4h overbought
@@ -15149,7 +15183,7 @@ class NostalgiaForInfinityX7(IStrategy):
             # 4h down move, 1h high, 4h overbought
             & ((rsi_3_4h_gt_55) | (aroonu_14_1h_lt_100) | (roc_9_4h_lt_20))
             # 4h down move, 4h high & overbought
-            & ((rsi_3_4h_gt_55) | aroonu_14_4h_lt_70 | (roc_9_4h_lt_20))
+            & ((rsi_3_4h_gt_55) | (aroonu_14_4h_lt_70) | (roc_9_4h_lt_20))
             # 4h down move, 1d high & overbought
             & ((rsi_3_4h_gt_55) | (aroonu_14_1d_lt_90) | (roc_9_1d_lt_60))
             # 4h down move, 4h high & overbought
@@ -15157,7 +15191,7 @@ class NostalgiaForInfinityX7(IStrategy):
             # 4h down move, 15m high, 1h high
             & ((rsi_3_4h_gt_60) | (aroonu_14_15m_lt_60) | (stochrsi_k_1h_lt_90))
             # 4h down move, 4h high & overbought
-            & ((rsi_3_4h_gt_60) | aroonu_14_4h_lt_70 | (roc_9_4h_lt_30))
+            & ((rsi_3_4h_gt_60) | (aroonu_14_4h_lt_70) | (roc_9_4h_lt_30))
             # 4h down move, 4h still high, 1d downtrend
             & ((rsi_3_4h_gt_60) | (stochrsi_k_4h_lt_50) | (roc_9_1d_gt_neg_30))
             # 4h down move, 4h & 1d overbought
@@ -15165,9 +15199,9 @@ class NostalgiaForInfinityX7(IStrategy):
             # 4h down move, 15m high, 4h high
             & ((rsi_3_4h_gt_65) | (aroonu_14_15m_lt_70) | (aroonu_14_4h_lt_90))
             # 4h down move, 4h high & overbought
-            & ((rsi_3_4h_gt_65) | aroonu_14_4h_lt_80 | (roc_9_4h_lt_10))
+            & ((rsi_3_4h_gt_65) | (aroonu_14_4h_lt_80) | (roc_9_4h_lt_10))
             # 1d down move, 4h & 1d downtrend
-            & ((rsi_3_1d_gt_3) | (roc_9_4h_gt_neg_40) | roc_9_1d_gt_neg_50)
+            & ((rsi_3_1d_gt_3) | (roc_9_4h_gt_neg_40) | (roc_9_1d_gt_neg_50))
             # 1d down move, 15m still high, 4h high
             & ((rsi_3_1d_gt_10) | (aroonu_14_15m_lt_70) | (stochrsi_k_4h_lt_80))
             # 1d down move, 4h & 1d downtrend
@@ -15189,7 +15223,7 @@ class NostalgiaForInfinityX7(IStrategy):
             # 1d down move, 15m high, 4h downtrend
             & ((rsi_3_1d_gt_25) | (aroonu_14_15m_lt_70) | (roc_9_4h_gt_neg_30))
             # 1d down move, 1h & 1d high
-            & ((rsi_3_1d_gt_25) | aroonu_14_1h_lt_80 | (aroonu_14_1d_lt_80))
+            & ((rsi_3_1d_gt_25) | (aroonu_14_1h_lt_80) | (aroonu_14_1d_lt_80))
             # 1d down move, 1d still high, 1d downtrend
             & ((rsi_3_1d_gt_25) | (stochrsi_k_1d_lt_50) | (roc_9_1d_gt_neg_20))
             # 1d down move, 1d high & overbought
@@ -15197,53 +15231,53 @@ class NostalgiaForInfinityX7(IStrategy):
             # 1d down move, 1h high, 1d downtrend
             & ((rsi_3_1d_gt_30) | (stochrsi_k_1h_lt_70) | (roc_9_1d_lt_20))
             # 1d down move, 1h & 1d high
-            & ((rsi_3_1d_gt_35) | aroonu_14_1h_lt_70 | (aroonu_14_1d_lt_90))
+            & ((rsi_3_1d_gt_35) | (aroonu_14_1h_lt_70) | (aroonu_14_1d_lt_90))
             # 1d down move, 1h high, 1d overbought
             & ((rsi_3_1d_gt_40) | (aroonu_14_1h_lt_90) | (roc_9_1d_lt_80))
             # 1d down move, 1d high & overbought
-            & ((rsi_3_1d_gt_40) | aroonu_14_1d_lt_100 | (roc_9_1d_lt_30))
+            & ((rsi_3_1d_gt_40) | (aroonu_14_1d_lt_100) | (roc_9_1d_lt_30))
             # 1d down move, 1d high & overbought
             & ((rsi_3_1d_gt_40) | (aroonu_14_1d_lt_80) | (roc_9_1d_lt_10))
             # 1d down move, 1h high, 1d overbought
-            & ((rsi_3_1d_gt_40) | (stochrsi_k_1h_lt_70) | roc_9_1d_lt_50)
+            & ((rsi_3_1d_gt_40) | (stochrsi_k_1h_lt_70) | (roc_9_1d_lt_50))
             # 15m still high, 4h high, 1d overbought
             & ((aroonu_14_15m_lt_50) | (rsi_14_4h < 60.0) | (roc_9_1d_lt_70))
             # 15m still high, 1h downtrend, 4h overbought
             & ((aroonu_14_15m_lt_50) | (roc_9_1h_gt_neg_10) | (roc_9_4h_lt_40))
             # 15m high, 4h high & overbought
-            & ((aroonu_14_15m_lt_60) | aroonu_14_4h_lt_70 | (roc_9_4h_lt_20))
+            & ((aroonu_14_15m_lt_60) | (aroonu_14_4h_lt_70) | (roc_9_4h_lt_20))
             # 15m & 4h high, 1d overbought
-            & ((aroonu_14_15m_lt_60) | aroonu_14_4h_lt_70 | (roc_9_1d_lt_10))
+            & ((aroonu_14_15m_lt_60) | (aroonu_14_4h_lt_70) | (roc_9_1d_lt_10))
             # 15m high, 15m & 4h overbought
             & ((aroonu_14_15m_lt_60) | (roc_9_15m < 10.0) | (roc_9_4h_lt_20))
             # 15m high, 4h downtrend
             & ((aroonu_14_15m_lt_60) | (roc_9_4h_gt_neg_30))
             # 15m & 1h & 4h high
-            & ((aroonu_14_15m_lt_70) | (aroonu_14_1h_lt_100) | aroonu_14_4h_lt_100)
+            & ((aroonu_14_15m_lt_70) | (aroonu_14_1h_lt_100) | (aroonu_14_4h_lt_100))
             # 15m & 4h & 1d high
-            & ((aroonu_14_15m_lt_70) | aroonu_14_4h_lt_70 | (aroonu_14_1d_lt_90))
+            & ((aroonu_14_15m_lt_70) | (aroonu_14_4h_lt_70) | (aroonu_14_1d_lt_90))
             # 15m & 4h high, 4h overbought
-            & ((aroonu_14_15m_lt_70) | aroonu_14_4h_lt_70 | (roc_9_4h_lt_10))
+            & ((aroonu_14_15m_lt_70) | (aroonu_14_4h_lt_70) | (roc_9_4h_lt_10))
             # 15m & 4h high, 1d downtrend
-            & ((aroonu_14_15m_lt_70) | aroonu_14_4h_lt_70 | (roc_9_1d_gt_neg_20))
+            & ((aroonu_14_15m_lt_70) | (aroonu_14_4h_lt_70) | (roc_9_1d_gt_neg_20))
             # 15m & 1d high, 1d overbought
             & ((aroonu_14_15m_lt_70) | (aroonu_14_1d_lt_90) | (roc_9_1d_lt_100))
             # 15m high, 4h downtrend, 1d overbought
             & ((aroonu_14_15m_lt_70) | (roc_9_4h_gt_neg_30) | (roc_9_1d_lt_200))
             # 4h down move, 1h still high, 1d downtrend
-            & ((rsi_3_4h_gt_15) | (aroonu_14_1h_lt_40) | roc_9_1d_gt_neg_50)
+            & ((rsi_3_4h_gt_15) | (aroonu_14_1h_lt_40) | (roc_9_1d_gt_neg_50))
             # 1h & 4h high, 4h overbought
-            & (aroonu_14_1h_lt_80 | aroonu_14_4h_lt_100 | (roc_9_4h_lt_10))
+            & (aroonu_14_1h_lt_80 | (aroonu_14_4h_lt_100) | (roc_9_4h_lt_10))
             # 1h high, 1d high & overbought
-            & ((aroonu_14_1h_lt_90) | aroonu_14_1d_lt_100 | (roc_9_1d_lt_30))
+            & ((aroonu_14_1h_lt_90) | (aroonu_14_1d_lt_100) | (roc_9_1d_lt_30))
             # 1h high, 4h downtrend
             & ((aroonu_14_1h_lt_90) | (roc_9_4h_gt_neg_20))
             # 1h high, 4h & 1d overbought
             & ((aroonu_14_1h_lt_90) | (roc_9_4h_lt_10) | (roc_9_1d_lt_20))
             # 4h & 1d high, 4h overbought
-            & (aroonu_14_4h_lt_80 | aroonu_14_1d_lt_100 | (roc_9_4h_lt_10))
+            & (aroonu_14_4h_lt_80 | (aroonu_14_1d_lt_100) | (roc_9_4h_lt_10))
             # 4h & 1d high, 1d downtrend
-            & (aroonu_14_4h_lt_80 | aroonu_14_1d_lt_100 | (roc_9_1d_gt_neg_20))
+            & (aroonu_14_4h_lt_80 | (aroonu_14_1d_lt_100) | (roc_9_1d_gt_neg_20))
             # 1d high, 4h & 1d downtrend
             & ((aroonu_14_1d_lt_80) | (roc_9_4h_gt_neg_20) | (roc_9_1d_gt_neg_20))
             # 1d high, 1h & 4h downtrend
@@ -15914,6 +15948,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((rsi_3_4h_gt_30) | (aroonu_14_1h_lt_70) | (roc_9_4h_gt_neg_10))
             # 4h down move, 1h high, 1d downtrend
             & ((rsi_3_4h_gt_30) | (stochrsi_k_1h_lt_60) | (roc_9_1d_gt_neg_40))
+            # 4h down move, 1d high & overbought
+            & ((rsi_3_4h_gt_40) | (aroonu_14_1d_lt_100) | (roc_9_1d_lt_80))
             # 4h down move, 4h & 1d high
             & ((rsi_3_4h_gt_35) | (aroonu_14_4h_lt_70) | (aroonu_14_1d_lt_100))
             # 4h down move, 4h high & overbought
@@ -16299,6 +16335,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((rsi_3_15m_gt_20) | (rsi_3_1h_gt_40) | (rsi_3_4h_gt_40) | (rsi_3_1d_gt_40) | (stochrsi_k_4h_lt_70))
             # 15m & 1h down move, 1h high
             & ((rsi_3_15m_gt_20) | (rsi_3_1h_gt_45) | (aroonu_14_1h_lt_70))
+            # 15m & 1h & 4h down move, 4h & 1d overbought
+            & ((rsi_3_15m_gt_20) | (rsi_3_1h_gt_50) | (rsi_3_4h_gt_60) | (roc_9_4h_lt_10) | (roc_9_1d_lt_20))
             # 15m & 1h down move, 1h high
             & ((rsi_3_15m_gt_20) | (rsi_3_1h_gt_60) | (aroonu_14_1h_lt_90))
             # 15m & 1h down move, 4h high
@@ -18946,6 +18984,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((rsi_3_1h_gt_10) | (rsi_3_4h_gt_15) | (rsi_14_4h_lt_40))
             # 1h & 4h down move, 1h still high
             & ((rsi_3_1h_gt_10) | (rsi_3_4h_gt_15) | (aroonu_14_1h_lt_50))
+            # 1h & 4h & 1d down move, 1d high
+            & ((rsi_3_1h_gt_10) | (rsi_3_4h_gt_20) | (rsi_3_1d_gt_30) | (aroonu_14_1d_lt_80))
             # 1h & 4h down move, 4h still high
             & ((rsi_3_1h_gt_10) | (rsi_3_4h_gt_20) | (stochrsi_k_4h_lt_50))
             # 1h & 4h down move, 1d downtrend
@@ -20195,6 +20235,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((rsi_3_15m_gt_15) | (rsi_3_1h_gt_15) | (rsi_3_4h_gt_35) | (rsi_3_1d_gt_35) | (aroonu_14_4h_lt_30))
             # 15m & 1h down move, 4h high
             & ((rsi_3_15m_gt_15) | (rsi_3_1h_gt_15) | (aroonu_14_4h_lt_75))
+            # 15m & 1h & 4h & 1d down move, 1d high
+            & ((rsi_3_15m_gt_15) | (rsi_3_1h_gt_30) | (rsi_3_4h_gt_30) | (rsi_3_1d_gt_50) | (aroonu_14_1d_lt_90))
             # 15m & 4h down move, 4h high
             & ((rsi_3_15m_gt_15) | (rsi_3_4h_gt_20) | (aroonu_14_4h_lt_60))
             # 15m & 4h down move, 4h still high
@@ -20856,6 +20898,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((rsi_3_4h_gt_3) | (stochrsi_k_1h_lt_20) | (roc_9_4h_gt_neg_30))
             # 4h down move, 1h & 4h downtrend
             & ((rsi_3_4h_gt_3) | (roc_9_1h_gt_neg_30) | (roc_9_4h_gt_neg_30))
+            # 4h & 1d down move, 1h downtrend
+            & ((rsi_3_4h_gt_5) | (rsi_3_1d_gt_20) | (roc_9_1h_gt_neg_50))
             # 4h down move, 1d high, 4h downtrend
             & ((rsi_3_4h_gt_5) | (aroonu_14_1d_lt_80) | (roc_9_4h_gt_neg_10))
             # 4h down move, 1h still high
@@ -21063,11 +21107,15 @@ class NostalgiaForInfinityX7(IStrategy):
             # 15m down move, 4h high & overbought
             & ((rsi_3_15m_gt_30) | (aroonu_14_4h_lt_80) | (roc_9_4h_lt_80))
             # 15m down move, 1h & 4h high
-            & ((rsi_3_15m_gt_30) | (stochrsi_k_1h_lt_80) | (stochrsi_k_4h_lt_90))
+            & ((rsi_3_15m_gt_30) | (stochrsi_k_1h_lt_70) | (stochrsi_k_4h_lt_80))
             # 15m & 1h & 4h down move, 4h high, 1d overbought
             & ((rsi_3_15m_gt_35) | (rsi_3_1h_gt_40) | (rsi_3_4h_gt_65) | (stochrsi_k_4h_lt_70) | (roc_9_1d_lt_10))
             # 15m & 1h down move, 1d downtrend, 1d overbought
             & ((rsi_3_15m_gt_35) | (rsi_3_1h_gt_50) | (cmf_20_1d_gt_neg_0_10) | (roc_9_1d_lt_50))
+            # 15m & 1h & 1d down move, 15m still high, 1d high
+            & (
+              (rsi_3_15m_gt_35) | (rsi_3_1h_gt_55) | (rsi_3_1d_gt_65) | (stochrsi_k_15m_lt_50) | (stochrsi_k_1d_lt_80)
+            )
             # 15m & 1h down move, 4h high, 1d overbought
             & ((rsi_3_15m_gt_35) | (rsi_3_1h_gt_65) | (stochrsi_k_4h_lt_70) | (roc_9_1d_lt_100))
             # 15m & 1h down move, 1h & 4h high
@@ -21078,6 +21126,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((rsi_3_15m_gt_35) | (rsi_3_1d_gt_35) | (rsi_14_1d_lt_50) | (aroonu_14_4h_lt_80) | (roc_9_1h_lt_10))
             # 15m down move, 4h high, 1d high & overbought
             & ((rsi_3_15m_gt_35) | (stochrsi_k_4h_lt_70) | (stochrsi_k_1d_lt_80) | (roc_9_1d_lt_30))
+            # 15m down move, 1h & 1d overbought
+            & ((rsi_3_15m_gt_40) | (roc_9_1h_lt_20) | (roc_9_1d_lt_100))
             # 15m & 1h & 4h down move, 4h high, 1d overbought
             & ((rsi_3_15m_gt_40) | (rsi_3_1h_gt_40) | (rsi_3_4h_gt_65) | (stochrsi_k_4h_lt_70) | (roc_9_1d_lt_20))
             # 15m & 1h down move, 1d high, 4h & 1d overbought
@@ -21094,6 +21144,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((rsi_3_15m_gt_40) | (rsi_3_1h_gt_60) | (stochrsi_k_4h_lt_80))
             # 15m & 1h down move, 1h still high, 1d high & overbought
             & ((rsi_3_15m_gt_40) | (rsi_3_1h_gt_65) | (rsi_14_1h_lt_50) | (stochrsi_k_1d_lt_90) | (roc_9_1d_lt_10))
+            # 15m & 1h down move, 1d high, 4h & 1d overbought
+            & ((rsi_3_15m_gt_40) | (rsi_3_1h_gt_65) | (stochrsi_k_1d_lt_80) | (roc_9_4h_lt_50) | (roc_9_1d_lt_50))
             # 15m & 4h down move, 4h high, 1d high & overbought
             & ((rsi_3_15m_gt_40) | (rsi_3_4h_gt_60) | (aroonu_14_4h_lt_80) | (aroonu_14_1d_lt_80) | (roc_9_1d_lt_30))
             # 15m down move, 4h downtrend, 4h high & overbought
@@ -21126,6 +21178,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((rsi_3_15m_gt_45) | (rsi_3_1h_gt_45) | (rsi_3_1d_gt_50) | (aroonu_14_15m_lt_60) | (aroonu_14_1h_lt_90))
             # 15m & 1h down move, 1d high, 4h overbought
             & ((rsi_3_15m_gt_45) | (rsi_3_1h_gt_45) | (aroonu_14_15m_lt_60) | (aroonu_14_1d_lt_100) | (roc_9_4h_lt_10))
+            # 15m & 1h down move, 15m & 4h high, 1d overbought
+            & ((rsi_3_15m_gt_45) | (rsi_3_1h_gt_45) | (aroonu_14_15m_lt_70) | (aroonu_14_4h_lt_80) | (roc_9_1d_lt_30))
             # 15m & 1h down move, 15m high, 4h high
             & ((rsi_3_15m_gt_45) | (rsi_3_1h_gt_55) | (aroonu_14_15m_lt_70) | (aroonu_14_4h_lt_100))
             # 15m & 1h down move, 1h high, 4h high, 4h overbought
@@ -21150,6 +21204,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((rsi_3_15m_gt_45) | (aroonu_14_15m_lt_70) | (aroonu_14_4h_lt_100) | (stochrsi_k_1d_lt_90))
             # 15m down move, 15m & 1h & 4h high
             & ((rsi_3_15m_gt_45) | (aroonu_14_15m_lt_80) | (aroonu_14_1h_lt_80) | (aroonu_14_4h_lt_100))
+            # 15m down move, 1h & 4h high, 1d overbought
+            & ((rsi_3_15m_gt_45) | (aroonu_14_1h_lt_90) | (aroonu_14_4h_lt_100) | (roc_9_1d_lt_20))
             # 15m down move, 1h still high, 4h high, 4h overbought
             & ((rsi_3_15m_gt_45) | (stochrsi_k_1h_lt_50) | (stochrsi_k_4h_lt_70) | (roc_9_4h_lt_20))
             # 15m down move, 1h & 4h high, 1d overbought
@@ -21184,6 +21240,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((rsi_3_15m_gt_55) | (rsi_3_1d_gt_55) | (aroonu_14_15m_lt_50) | (stochrsi_k_1h_lt_90))
             # 15m down move, 1d high, 15m still high, 1d high
             & ((rsi_3_15m_gt_55) | (aroonu_14_1d_lt_100) | (stochrsi_k_15m_lt_50) | (stochrsi_k_1d_lt_90))
+            # 15m down move, 4h high, 1h & 4h overbought
+            & ((rsi_3_15m_gt_55) | (stochrsi_k_4h_lt_90) | (roc_9_1h_lt_20) | (roc_9_4h_lt_20))
             # 15m down move, 4h high, 4h & 1d overbought
             & ((rsi_3_15m_gt_55) | (stochrsi_k_4h_lt_90) | (roc_9_4h_lt_30) | (roc_9_1d_lt_30))
             # 15m & 1h down move, 15m & 4h high
@@ -21196,6 +21254,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((rsi_3_1h_gt_30) | (aroonu_14_4h_lt_80) | (aroonu_14_1d_lt_100) | (roc_9_1d_lt_30))
             # 1h & 1d down move, 1h still high, 4h high
             & ((rsi_3_1h_gt_35) | (rsi_3_1d_gt_35) | (stochrsi_k_1h_lt_40) | (stochrsi_k_4h_lt_80))
+            # 1h & 1d down move, 1d high & overbought
+            & ((rsi_3_1h_gt_40) | (rsi_3_1d_gt_50) | (aroonu_14_1d_lt_80) | (roc_9_1d_lt_50))
             # 1h down move, 15m high, 4h high, 1d overbought
             & ((rsi_3_1h_gt_40) | (aroonu_14_15m_lt_60) | (aroonu_14_4h_lt_80) | (roc_9_1d_lt_10))
             # 1h down move, 1h high, 1d still high, 1d overbought
@@ -21220,6 +21280,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((rsi_3_1h_gt_55) | (stochrsi_k_1h_lt_70) | (roc_9_4h_lt_60))
             # 1h & 4h down move, 1d high, 1d overbought
             & ((rsi_3_1h_gt_60) | (rsi_3_4h_gt_60) | (stochrsi_k_1d_lt_80) | (roc_9_1d_lt_50))
+            # 1h down move, 1h high, 1d high & overbought
+            & ((rsi_3_1h_gt_60) | (stochrsi_k_1h_lt_60) | (stochrsi_k_1d_lt_90) | (roc_9_1d_lt_80))
             # 1h down move, 1d downtrend, 1h high, 4h high
             & ((rsi_3_1h_gt_65) | (cmf_20_1d_gt_neg_0_10) | (aroonu_14_1h_lt_90) | (stochrsi_k_4h_lt_90))
             # 1h down move, 1h high, 4h high
@@ -21264,6 +21326,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((aroonu_14_1h_lt_80) | (aroonu_14_4h_lt_80) | (aroonu_14_1d_lt_100) | (roc_9_1d_lt_40))
             # 1h & 4h & 1d high, 1d overbought
             & ((aroonu_14_1h_lt_80) | (aroonu_14_4h_lt_100) | (aroonu_14_1d_lt_100) | (roc_9_1d_lt_20))
+            # 1h & 4h high, 1h & 4h & 1d overbought
+            & ((aroonu_14_1h_lt_80) | (aroonu_14_4h_lt_100) | (roc_9_1h_lt_20) | (roc_9_4h_lt_20) | (roc_9_1d_lt_20))
             # 1h & 4h & 1d high
             & ((aroonu_14_1h_lt_100) | (aroonu_14_4h_lt_100) | (aroonu_14_1d_lt_100))
             # 1h & 4h high, 1d overbought
@@ -21274,6 +21338,8 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((aroonu_14_4h_lt_90) | (aroonu_14_1d_lt_90) | (roc_9_1d_lt_80))
             # 4h & 1d high, 4h overbought
             & ((aroonu_14_4h_lt_100) | (aroonu_14_1d_lt_100) | (roc_9_4h_lt_80))
+            # 1d high, 1h & 4h & 1d overbought
+            & ((aroonu_14_1d_lt_100) | (roc_9_1h_lt_10) | (roc_9_4h_lt_40) | (roc_9_1d_lt_100))
             # 1d high, 4h & 1d overbought
             & ((aroonu_14_1d_lt_100) | (roc_9_4h_lt_80) | (roc_9_1d_lt_80))
             # 1h still high, 1d high, 4h & 1d overbought
@@ -25561,7 +25627,7 @@ class NostalgiaForInfinityX7(IStrategy):
             # 15m & 4h up move, 1d low
             & ((rsi_3_15m_lt_90) | (rsi_3_4h_lt_85) | (stochrsi_k_1d_gt_30))
             # 15m up move, 1h still low, 1d low
-            & ((rsi_3_15m_lt_90) | (aroonu_14_1h > 50.0) | (aroonu_14_1d > 30.0))
+            & ((rsi_3_15m_lt_90) | (aroonu_14_1h > 50.0) | (aroonu_14_1d_gt_30))
             # 15m up move, 1h high
             & ((rsi_3_15m_lt_90) | (aroonu_14_1h_lt_100))
             # 15m up move, 1h still low
@@ -25579,9 +25645,11 @@ class NostalgiaForInfinityX7(IStrategy):
             # 15m up move, 4h low, 15m uptrend, 4h oversold
             & ((rsi_3_15m_lt_80) | (rsi_14_4h_gt_20) | (aroonu_14_15m_lt_100) | (roc_9_4h_gt_neg_20))
             # 15m up move, 1h low
-            & ((rsi_3_15m_lt_80) | (aroonu_14_1h > 10.0))
+            & ((rsi_3_15m_lt_80) | (aroonu_14_1h_gt_10))
             # 15m up move, 1h low, 1d uptrend
             & ((rsi_3_15m_lt_80) | (aroonu_14_1h_gt_40) | (roc_9_1d_lt_100))
+            # 15m up move, 1h still low, 1d oversold
+            & ((rsi_3_15m_lt_80) | (stochrsi_k_1h_gt_50) | (roc_9_1d_gt_neg_30))
             # 15m up move, 4h low
             & ((rsi_3_15m_lt_80) | (stochrsi_k_4h_gt_40))
             # 15m up move, 1h uptrend
@@ -25601,7 +25669,7 @@ class NostalgiaForInfinityX7(IStrategy):
             # 1h up move, 15m uptrend
             & ((rsi_3_1h_lt_90) | (aroonu_14_15m_lt_100))
             # 1h up move, 1d low
-            & ((rsi_3_1h_lt_90) | (stochrsi_k_1d > 10.0))
+            & ((rsi_3_1h_lt_90) | (stochrsi_k_1d_gt_10))
             # 1h up move, 1h & 4h uptrend
             & ((rsi_3_1h_lt_90) | (roc_9_1h_lt_30) | (roc_9_4h_lt_30))
             # 1h up move, 4h uptrend
@@ -26262,25 +26330,126 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((roc_9_1d > -25.0) | (stochrsi_k_1h < 60.0))
             # 15m + 1h ultra-capitulation = V-bottom forming regardless of CMF
             & ((rsi_3_15m_gt_10) | (rsi_3_1h_gt_15))
+            # 1h overbought + 1d CMF positive = bull pullback bouncing on inflow
+            & ((stochrsi_k_1h < 70.0) | (cmf_20_1d < 0.0))
             # 4h STOCHRSIk still extreme + 1h moderate = second leg waiting bounce
             & ((stochrsi_k_4h > 10.0) | (rsi_3_1h_gt_30))
             # 1d STOCHRSIk floor + 1d CMF positive = institutional buying after crash
             & ((stochrsi_k_1d > 5.0) | (cmf_20_1d < 0.0) | (rsi_3_4h_gt_45))
             # 1d big crash + 1h moderate overbought = bull pullback after sell-off
             & ((roc_9_1d > -22.0) | (stochrsi_k_1h < 70.0))
-            # 1h overbought + 1d CMF positive = bull pullback bouncing on inflow
-            & ((stochrsi_k_1h < 70.0) | (cmf_20_1d < 0.0))
+            ##########################################################################################################
+            # 15m & 1d down move, 15m & 1d low
+            & ((rsi_3_15m_gt_5) | (rsi_3_1d_gt_15) | (stochrsi_k_15m_gt_10) | (stochrsi_k_1d_gt_30))
+            # 15m & 1d down move, 15m & 4h low
+            & ((rsi_3_15m_gt_5) | (rsi_3_1d_gt_20) | (stochrsi_k_15m_gt_30) | (stochrsi_k_4h_gt_30))
+            # 15m & 4h down move, 15m & 4h low
+            & ((rsi_3_15m_gt_10) | (rsi_3_4h_gt_30) | (aroonu_14_15m_gt_0) | (aroonu_14_4h_gt_0))
+            # 15m & 1d down move, 4h low
+            & ((rsi_3_15m_gt_10) | (rsi_3_1d_gt_20) | (aroonu_14_4h_gt_0) | (stochrsi_k_4h_gt_10))
+            # 15m & 4h down move, 15m & 1h & 4h low
+            & (
+              (rsi_3_15m_gt_15) | (rsi_3_4h_gt_25) | (aroonu_14_15m_gt_0) | (aroonu_14_1h_gt_0) | (aroonu_14_4h_gt_20)
+            )
+            # 15m & 4h down move, 15m & 4h low
+            & ((rsi_3_15m_gt_15) | (rsi_3_4h_gt_25) | (aroonu_14_15m_gt_0) | (aroonu_14_4h_gt_10))
+            # 15m & 1d down move, 15m & 1d low
+            & ((rsi_3_15m_gt_15) | (rsi_3_1d_gt_15) | (aroonu_14_15m_gt_10) | (aroonu_14_1d_gt_20))
+            # 15m & 4h down move, 15m & 4h low
+            & ((rsi_3_15m_gt_20) | (rsi_3_4h_gt_40) | (stochrsi_k_15m_gt_20) | (stochrsi_k_4h_gt_20))
+            # 15m & 1h down move, 15m & 1h low
+            & ((rsi_3_15m_gt_25) | (rsi_3_1h_gt_25) | (stochrsi_k_15m_gt_10) | (stochrsi_k_1h_gt_20))
+            # 15m & 4h down move, 15m & 4h low
+            & ((rsi_3_15m_gt_25) | (rsi_3_4h_gt_35) | (stochrsi_k_15m_gt_10) | (stochrsi_k_4h_gt_10))
+            # 1h & 1d down move, 15m & 4h low
+            & ((rsi_3_1h_gt_5) | (rsi_3_1d_gt_30) | (aroonu_14_15m_gt_0) | (aroonu_14_4h_gt_10))
+            # 1h down move, 1h & 4h low
+            & ((rsi_3_1h_gt_5) | (stochrsi_k_1h_gt_10) | (stochrsi_k_4h_gt_20))
+            # 1h & 4h & 1d down move, 4h & 1d oversold
+            & ((rsi_3_1h_gt_10) | (rsi_3_4h_gt_20) | (rsi_3_1d_gt_20) | (roc_9_4h_gt_neg_30) | (roc_9_1d_gt_neg_40))
+            # 1h & 4h down move, 1h low
+            & ((rsi_3_1h_gt_10) | (rsi_3_4h_gt_15) | (stochrsi_k_1h_gt_10))
+            # 1h & 4h & 1d down move, 4h & 1d low
+            & ((rsi_3_1h_gt_10) | (rsi_3_4h_gt_40) | (rsi_3_1d_gt_40) | (aroonu_14_4h_gt_0) | (aroonu_14_1d_gt_20))
+            # 1h & 1d down move, 4h & 1d low
+            & ((rsi_3_1h_gt_10) | (rsi_3_1d_gt_30) | (aroonu_14_4h_gt_0) | (aroonu_14_1d_gt_10))
+            # 1h & 4h down move, 1h & 4h low
+            & ((rsi_3_1h_gt_15) | (rsi_3_4h_gt_15) | (stochrsi_k_1h_gt_30) | (stochrsi_k_4h_gt_30))
+            # 1h & 4h & 1d down move, 1h & 1d low
+            & ((rsi_3_1h_gt_15) | (rsi_3_4h_gt_25) | (rsi_3_1d_gt_30) | (stochrsi_k_1h_gt_10) | (stochrsi_k_1d_gt_10))
+            # 1h down move, 15m & 1h low
+            & ((rsi_3_1h_gt_15) | (aroonu_14_15m_gt_20) | (aroonu_14_1h_gt_20))
+            # 1h & 4h down move, 1h & 4h & 1d low
+            & (
+              (rsi_3_1h_gt_20) | (rsi_3_4h_gt_20) | (aroonu_14_1h_gt_20) | (aroonu_14_4h_gt_20) | (aroonu_14_1d_gt_20)
+            )
+            # 1h & 4h down move, 1h & 4h low, 1d downtrend
+            & (
+              (rsi_3_1h_gt_20)
+              | (rsi_3_4h_gt_20)
+              | (stochrsi_k_1h_gt_10)
+              | (stochrsi_k_1d_gt_10)
+              | (roc_9_1d_gt_neg_30)
+            )
+            # 1h & 4h down move, 1h & 4h low
+            & ((rsi_3_1h_gt_20) | (rsi_3_4h_gt_25) | (aroonu_14_1h_gt_0) | (aroonu_14_4h_gt_20))
+            # 1h & 1d down move, 1h & 1d low
+            & ((rsi_3_1h_gt_20) | (rsi_3_1d_gt_20) | (aroonu_14_1h_gt_10) | (aroonu_14_1d_gt_10))
+            # 1h & 1d down move, 1d uptrend, 4h & 1d low
+            & ((rsi_3_1h_gt_25) | (rsi_3_1d_gt_30) | (cmf_20_1d_lt_0_10) | (aroonu_14_4h_gt_20) | (aroonu_14_1d_gt_30))
+            # 1h & 1d down move, 1h & 1d low, 1d oversold
+            & (
+              (rsi_3_1h_gt_30) | (rsi_3_1d_gt_40) | (aroonu_14_1h_gt_10) | (stochrsi_k_1d_gt_10) | (roc_9_1d_gt_neg_30)
+            )
+            # 4h & 1d down move, 1d low
+            & ((rsi_3_4h_gt_15) | (rsi_3_1d_gt_15) | (stochrsi_k_1d_gt_10))
+            # 4h & 1d down move, 4h & 1d low
+            & ((rsi_3_4h_gt_15) | (rsi_3_1d_gt_20) | (stochrsi_k_4h_gt_20) | (stochrsi_k_1d_gt_20))
+            # 4h down move, 15m & 4h low
+            & ((rsi_3_4h_gt_15) | (aroonu_14_15m_gt_0) | (aroonu_14_4h_gt_10))
+            # 4h down move, 1h & 4h & 1d low
+            & ((rsi_3_4h_gt_20) | (aroonu_14_1h_gt_0) | (aroonu_14_4h_gt_20) | (aroonu_14_1d_gt_30))
+            # 4h & 1d down move, 4h & 1d low
+            & ((rsi_3_4h_gt_25) | (rsi_3_1d_gt_25) | (aroonu_14_4h_gt_0) | (aroonu_14_1d_gt_0))
+            # 4h & 1d down move, 1h & 4h & 1d low
+            & ((rsi_3_4h_gt_30) | (rsi_3_1d_gt_30) | (aroonu_14_1h_gt_0) | (aroonu_14_4h_gt_20) | (aroonu_14_1d_gt_20))
+            # 4h & 1d down move, 4h & 1d low
+            & ((rsi_3_4h_gt_30) | (rsi_3_1d_gt_30) | (aroonu_14_4h_gt_10) | (aroonu_14_1d_gt_10))
+            # 1d down move, 1d low, 1d oversold
+            & ((rsi_3_1d_gt_10) | (stochrsi_k_1d_gt_20) | (roc_9_1d_gt_neg_20))
+            # 1d down move, 15m & 1h uptrend, 1d low
+            & ((rsi_3_1d_gt_15) | (cmf_20_15m_lt_0_20) | (cmf_20_1h_lt_0_20) | (stochrsi_k_1d_gt_20))
+            # 1d down move, 4h & 1d low
+            & ((rsi_3_1d_gt_15) | (aroonu_14_4h_gt_0) | (aroonu_14_1d_gt_0))
+            # 1d down move, 1h & 1d low
+            & ((rsi_3_1d_gt_15) | (stochrsi_k_1h_gt_10) | (stochrsi_k_1d_gt_20))
+            # 1d down move, 4h & 1d low
+            & ((rsi_3_1d_gt_15) | (stochrsi_k_4h_gt_20) | (stochrsi_k_1d_gt_30))
+            # 1d down move, 1h & 4h low
+            & ((rsi_3_1d_gt_20) | (aroonu_14_1h_gt_10) | (aroonu_14_4h_gt_10))
+            # 1d down move, 15m uptrend, 1d low
+            & ((rsi_3_1d_gt_20) | (cmf_20_15m_lt_0_10) | (aroonu_14_1d_gt_0))
+            # 1d down move, 15m & 1h & 1d low
+            & ((rsi_3_1d_gt_25) | (aroonu_14_15m_gt_10) | (aroonu_14_1h_gt_10) | (aroonu_14_1d_gt_20))
+            # 1d down move, 15m & 1d low
+            & ((rsi_3_1d_gt_25) | (stochrsi_k_15m_gt_10) | (stochrsi_k_1d_gt_20))
+            # 1d down move, 15m & 1d low
+            & ((rsi_3_1d_gt_30) | (stochrsi_k_15m_gt_10) | (stochrsi_k_1d_gt_10))
+            # 1h & 4h low
+            & ((aroonu_14_1h_gt_0) | (aroonu_14_4h_gt_0))
           )
 
           # Logic — Breakdown below BB lower in downtrend
-          short_entry_logic.append(close < bbl_20_2_0)
-          short_entry_logic.append(rsi_14 < 32.0)
-          short_entry_logic.append(rsi_14 > 15.0)
-          short_entry_logic.append(ema_12 < ema_26)
-          short_entry_logic.append(rsi_3 < 20.0)
-          short_entry_logic.append(cmf_20 < -0.08)
-          short_entry_logic.append(obv_change_pct_15m < 0.0)
-          short_entry_logic.append(rsi_3_15m < 35.0)
+          short_entry_logic.append(
+            (rsi_3 < 20.0)
+            & (rsi_3_15m < 35.0)
+            & (rsi_14 > 15.0)
+            & (rsi_14 < 32.0)
+            & (cmf_20 < -0.08)
+            & (obv_change_pct_15m < 0.0)
+            & (ema_12 < ema_26)
+            & (close < bbl_20_2_0)
+          )
 
         # Condition #563 - Dead Cat Bounce mode (Short).
         if short_entry_condition_index == 563:
@@ -26310,6 +26479,34 @@ class NostalgiaForInfinityX7(IStrategy):
             & ((rsi_3_4h_gt_15) | (stochrsi_k_15m < 90.0))
             # 1d ultra-capitulation (STOCHRSIk = 0, RSI_3 < 10) = absolute bottom
             & ((rsi_3_1d_gt_10) | (stochrsi_k_1d > 5.0) | (rsi_3_4h_gt_40))
+            # 1d already recovering (RSI_3 elevated + STOCHRSIk not low) = real recovery, not dead-cat
+            & ((rsi_3_1d < 30.0) | (stochrsi_k_1d < 40.0))
+            # 4h RSI still elevated (both 14 and 3-period) = 4h not bearish enough = real recovery
+            & ((rsi_14_4h < 37.0) | (rsi_3_4h < 37.0))
+            # SCENARIO: 1d not-yet-recovered gate OR 4h reclaiming = failed dead-cat vs real recovery
+            & ((rsi_14_1d < 44.0) | (rsi_14_4h > 24.0))
+            # SCENARIO: 1d ultra-capitulated (RSI_3 at absolute bottom) = due for a bounce that liquidates the short
+            & (rsi_3_1d > 5.0)
+            # SCENARIO: 4h reclaiming OR 4h money-flow leaving = bounce building, not a dead-cat
+            & ((rsi_14_4h > 24.0) | (mfi_14_4h < 41.0))
+            # SCENARIO: 4h money inflow at a 1d stoch-bottom = accumulation, bounce building
+            & ((stochrsi_k_1d > 0.0) | (cci_20_change_pct_1h < -4.0))
+            # SCENARIO: 1d downside stalling + short-term ultra-oversold = sellers exhausted, reversal
+            & ((roc_9_1d < -5.0) | (rsi_3 > 28.0))
+            # SCENARIO: 1d/4h ultra-capitulated but 1h already recovering = bottom in, bounce started
+            & ((rsi_14_1h < 43.0) | (rsi_14_4h > 24.0))
+            # SCENARIO: 4h crashed hard + 1h bouncing = V-reversal after capitulation, pump liquidates short
+            & ((rsi_3_1d > 9.0) | (roc_9_4h > -23.0) | (rsi_14_1h < 40.0))
+            # SCENARIO: 1d massive crash + 1h uptrend birth = capitulation bottom reversing
+            & ((roc_9_1d > -42.0) | (aroonu_14_1h < 42.0))
+            # SCENARIO: overbought entry + 4h momentum still up = shorting into a trend bounce
+            & ((rsi_14 < 66.0) | (rsi_3_4h < 39.0))
+            # SCENARIO: 1d stoch at absolute bottom + 1d RSI mid = mixed, due-for-bounce zone
+            & ((stochrsi_k_1d > 0.0) | (rsi_14_1d < 43.0))
+            # SCENARIO: 4h absolute-oversold selloff = capitulation exhaustion, sharp bounce
+            & ((rsi_3_4h > 3.0) | (roc_9_4h > -25.0))
+            # SCENARIO: 1d ultra-cap + 1h CCI recovering = capitulation bottom bouncing
+            & ((rsi_3_1d > 9.0) | (cci_20_change_pct_1h > -38.0) | (rsi_3_4h > 17.0))
           )
 
           # Logic — Bounce that fails to reclaim resistance
@@ -44981,7 +45178,7 @@ class NostalgiaForInfinityX7(IStrategy):
     )
     is_long_buyback_entry = self.long_buyback_entry_v3(last_candle, previous_candle, slice_profit, True)
     is_long_rebuy_entry = self.long_rebuy_entry_v3(last_candle, previous_candle, slice_profit, True)
-
+    stake_fmt = ".8f" if self.config["stake_currency"] in ("BTC", "ETH", "BNB", "SOL") else ".3f"
     # De-risk level 1
 
     if (
@@ -45047,7 +45244,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"De-risk Level 1 [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+          f"De-risk Level 1 [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
         )
         return -ft_sell_amount, "derisk_level_1"
 
@@ -45116,7 +45313,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"De-risk Level 2 [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+          f"De-risk Level 2 [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
         )
         return -ft_sell_amount, "derisk_level_2"
 
@@ -45185,7 +45382,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"De-risk Level 3 [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+          f"De-risk Level 3 [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
         )
         return -ft_sell_amount, "derisk_level_3"
 
@@ -45237,7 +45434,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"De-risk Level 4 [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+          f"De-risk Level 4 [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
         )
         return -ft_sell_amount, "derisk_level_4"
 
@@ -45270,7 +45467,7 @@ class NostalgiaForInfinityX7(IStrategy):
         )
       )
       log.info(
-        f"Grinding entry (grind_1_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Tag: {self._grind_entry_tag}"
+        f"Grinding entry (grind_1_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Tag: {self._grind_entry_tag}"
       )
       order_tag = "grind_1_entry"
       if has_order_tags:
@@ -45344,7 +45541,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding de-risk (grind_1_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_1_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_1_current_grind_profit_stake} {stake_currency})"
+          f"Grinding de-risk (grind_1_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_1_total_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_1_current_grind_profit_stake:{stake_fmt}} {stake_currency})"
         )
         order_tag = "grind_1_derisk"
         for grind_entry_id in grind_1_buy_orders:
@@ -45383,7 +45580,7 @@ class NostalgiaForInfinityX7(IStrategy):
         )
       )
       log.info(
-        f"Grinding entry (grind_2_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Tag: {self._grind_entry_tag}"
+        f"Grinding entry (grind_2_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Tag: {self._grind_entry_tag}"
       )
       order_tag = "grind_2_entry"
       if has_order_tags:
@@ -45457,7 +45654,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding de-risk (grind_2_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_2_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_2_current_grind_profit_stake} {stake_currency})"
+          f"Grinding de-risk (grind_2_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_2_total_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_2_current_grind_profit_stake:{stake_fmt}} {stake_currency})"
         )
         order_tag = "grind_2_derisk"
         for grind_entry_id in grind_2_buy_orders:
@@ -45496,7 +45693,7 @@ class NostalgiaForInfinityX7(IStrategy):
         )
       )
       log.info(
-        f"Grinding entry (grind_3_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Tag: {self._grind_entry_tag}"
+        f"Grinding entry (grind_3_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Tag: {self._grind_entry_tag}"
       )
       order_tag = "grind_3_entry"
       if has_order_tags:
@@ -45570,7 +45767,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding de-risk (grind_3_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_3_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_3_current_grind_profit_stake} {stake_currency})"
+          f"Grinding de-risk (grind_3_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_3_total_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_3_current_grind_profit_stake:{stake_fmt}} {stake_currency})"
         )
         order_tag = "grind_3_derisk"
         for grind_entry_id in grind_3_buy_orders:
@@ -45625,7 +45822,7 @@ class NostalgiaForInfinityX7(IStrategy):
         )
       )
       log.info(
-        f"Grinding entry (grind_4_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Tag: {self._grind_entry_tag}"
+        f"Grinding entry (grind_4_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Tag: {self._grind_entry_tag}"
       )
       order_tag = "grind_4_entry"
       if has_order_tags:
@@ -45699,7 +45896,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding de-risk (grind_4_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_4_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_4_current_grind_profit_stake} {stake_currency})"
+          f"Grinding de-risk (grind_4_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_4_total_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_4_current_grind_profit_stake:{stake_fmt}} {stake_currency})"
         )
         order_tag = "grind_4_derisk"
         for grind_entry_id in grind_4_buy_orders:
@@ -45748,7 +45945,7 @@ class NostalgiaForInfinityX7(IStrategy):
         )
       )
       log.info(
-        f"Grinding entry (grind_5_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Tag: {self._grind_entry_tag}"
+        f"Grinding entry (grind_5_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Tag: {self._grind_entry_tag}"
       )
       order_tag = "grind_5_entry"
       if has_order_tags:
@@ -45822,7 +46019,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding de-risk (grind_5_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_5_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_5_current_grind_profit_stake} {stake_currency})"
+          f"Grinding de-risk (grind_5_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_5_total_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_5_current_grind_profit_stake:{stake_fmt}} {stake_currency})"
         )
         order_tag = "grind_5_derisk"
         for grind_entry_id in grind_5_buy_orders:
@@ -45883,7 +46080,7 @@ class NostalgiaForInfinityX7(IStrategy):
         )
       )
       log.info(
-        f"Buyback entry (buyback_1_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+        f"Buyback entry (buyback_1_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
       )
       order_tag = "buyback_1_entry"
       if has_order_tags:
@@ -45986,7 +46183,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Buyback de-risk (buyback_1_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {buyback_1_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({buyback_1_current_grind_stake_profit} {stake_currency})"
+          f"Buyback de-risk (buyback_1_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {buyback_1_total_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({buyback_1_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
         )
         order_tag = "buyback_1_derisk"
         for grind_entry_id in buyback_1_buy_orders:
@@ -46025,7 +46222,7 @@ class NostalgiaForInfinityX7(IStrategy):
         )
       )
       log.info(
-        f"Rebuy (rebuy_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+        f"Rebuy (rebuy_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
       )
       if has_order_tags:
         return buy_amount, "rebuy_entry"
@@ -46150,6 +46347,8 @@ class NostalgiaForInfinityX7(IStrategy):
       and (last_close > (last_close_max_48 * 0.85))
       and (last_close < (last_ema_12 * 0.980))
       and ((last_rsi_3_1h > 20.0) or (last_rsi_3_1d > 20.0))
+      and ((last_rsi_3_1h > 20.0) or (last_stochrsi_k_1d < 70.0))
+      and ((last_rsi_3_1h > 25.0) or (last_stochrsi_k_1h < 70.0))
       and ((last_rsi_3_4h > 30.0) or (last_stochrsi_k_4h < 60.0))
     ):
       self._grind_entry_tag = "g3"
@@ -46308,7 +46507,9 @@ class NostalgiaForInfinityX7(IStrategy):
       and (last_sma_9 > last_sma_21)
       and (last_ema_12_4h > last_ema_200_4h)
       and (last_close > (last_close_max_48 * 0.90))
+      and ((last_rsi_3_1h > 30.0) or (last_stochrsi_k_1h < 70.0))
       and ((last_rsi_3_1h > 40.0) or (last_aroonu_14_1h < 80.0))
+      and ((last_rsi_3_1d > 25.0) or (last_stochrsi_k_1h < 80.0))
     ):
       self._grind_entry_tag = "g14"
       return True
@@ -46387,9 +46588,12 @@ class NostalgiaForInfinityX7(IStrategy):
       and (last_aroonu_14 < 30.0)
       and (last_aroonu_14_4h > 50.0)
       and (last_roc_9_1d > -15.0)
-      and ((last_candle["STOCHRSIk_14_14_3_3_4h"] < 90.0) or (last_roc_9_4h < 30.0))
       and (last_ema_50_4h > last_ema_100_4h)
       and (last_close < (last_close_max_48 * 0.95))
+      and ((last_rsi_3_1h > 50.0) or (last_roc_9_1d < 60.0))
+      and ((last_rsi_3_4h > 40.0) or (last_aroonu_14_4h < 90.0))
+      and ((last_rsi_3_4h > 45.0) or (last_aroonu_14_4h < 100.0))
+      and ((last_stochrsi_k_4h < 90.0) or (last_roc_9_4h < 30.0))
     ):
       self._grind_entry_tag = "g20"
       return True
@@ -46402,6 +46606,82 @@ class NostalgiaForInfinityX7(IStrategy):
       and (last_close < (last_ema_20 * 0.955))
     ):
       self._grind_entry_tag = "g21"
+      return True
+    # g22 — early recovery rebuild: reclaiming off the low BEFORE the 4h trend confirms (g14 needs
+    #        EMA_12_4h > EMA_200_4h and fires too late for a deep-derisk bounce). Anti-fake-rise gating via
+    #        multi-TF RSI recovery + reclaim off the 4h low + not-extended. NOTE: slice_profit_entry gate
+    #        removed — it self-defeats in recovery (last grind buy is in profit); underwater-scope TBD.
+    if (
+      (last_rsi_3 > 30.0)
+      and (last_rsi_3_15m > 30.0)
+      and (last_rsi_14 > 45.0)
+      and (last_rsi_14_1h > 45.0)
+      and (last_roc_9_1h > 0.0)
+      and (last_roc_9_4h > -10.0)
+      # anti-parabolic: even at a formed bottom, a parabolic 4h overshoot reverses (dead-cat).
+      # cross-coin (SFP/CELR/DYDX/APE): cuts 17 severe at ~1% good cost within recovery-starts.
+      and (last_roc_9_4h < 25.0)
+      # recovery-started gate: only rebuild once the 4h bottom is IN (not still making new lows).
+      # g22's job is the recovery rebuild — NOT entering mid-dump (that's g1..g21). AROOND high =
+      # a fresh 4h low was just made = still dumping; require it low = bottom formed = recovery start.
+      and (last_aroonu_14_4h < 50.0)
+      # aggressive risk-free: g22 fires ONLY deep below the 4h 200-EMA (fresh recovery zone). The
+      # near/above-EMA overextended-bounce zone is where dead-cats live AND where g22's late-recovery
+      # adds sit — we sacrifice those wins on purpose, because g23 (extended-continuation, ~0.2% severe)
+      # backstops the real recoveries above. So g22 stays clean, g23 captures the continuation.
+      and (last_close < last_ema_200_4h)
+      and (last_close > (last_low_min_12_4h * 1.10))
+      and (last_close > (last_ema_20 * 0.97))
+      and (last_close < (last_ema_20 * 1.02))
+      and ((last_rsi_3_4h > 50.0) or (last_aroonu_14_1h < 100.0))
+      and ((last_rsi_3_1d > 10.0) or (last_aroonu_14_1d < 70.0))
+      and ((last_rsi_3_1d > 40.0) or (last_stochrsi_k_1h < 80.0))
+      and ((last_rsi_3_1d > 40.0) or (last_stochrsi_k_4h < 80.0))
+      and ((last_rsi_3_1d > 45.0) or (last_aroonu_14_1h < 100.0))
+      and ((last_rsi_3_1d > 45.0) or (last_aroonu_14_4h < 100.0))
+      and ((last_rsi_3_1d > 45.0) or (last_stochrsi_k_1h < 90.0))
+      and ((last_rsi_3_1d > 45.0) or (last_stochrsi_k_4h < 90.0))
+      and ((last_aroonu_14_15m < 80.0) or (last_stochrsi_k_15m < 80.0))
+      and ((last_roc_9_1d > -20.0) or (last_aroonu_14_4h < 100.0))
+      and ((last_roc_9_1d > -20.0) or (last_stochrsi_k_4h < 90.0))
+      and ((last_roc_9_1d > -30.0) or (last_stochrsi_k_1h < 90.0))
+    ):
+      self._grind_entry_tag = "g22"
+      return True
+    # g23 — pump-continuation scalp: extended zone ABOVE g22's EMA_20*1.02 cap. Only rides a CONFIRMED
+    # continuation (price already advancing past the reclaim), so dead-cats (which roll over before
+    # reaching the extended zone) are structurally avoided. Complements g22: g22 = early recovery-start
+    # (ambiguous zone, dead-cat risk trimmed by P1), g23 = confirmed continuation (clean, ~0.2% severe).
+    if (
+      (last_rsi_3 > 30.0)
+      and (last_rsi_3_15m > 30.0)
+      and (last_rsi_14 > 50.0)
+      and (last_rsi_14_1h > 50.0)
+      and (last_roc_9_1h > 0.0)
+      and (last_roc_9_4h > 0.0)
+      # anti-parabolic blow-off + anti-exhaustion top
+      and (last_roc_9_4h < 25.0)
+      and ((last_stochrsi_k < 97.0) or (last_rsi_14 < 80.0))
+      and (last_close > (last_low_min_12_4h * 1.10))
+      # extended zone: above g22's 1.02*EMA cap = continuation confirmed, not a reclaim
+      and (last_close >= (last_ema_20 * 1.02))
+      and (last_close < (last_ema_20 * 1.12))
+      and ((last_rsi_3_4h > 50.0) or (last_aroonu_14_4h < 70.0))
+      and ((last_rsi_3_1d > 15.0) or (last_stochrsi_k_1h < 80.0))
+      and ((last_rsi_3_1d > 30.0) or (last_aroonu_14_1h < 100.0))
+      and ((last_rsi_3_1d > 30.0) or (last_aroonu_14_4h < 100.0))
+      and ((last_rsi_3_1d > 50.0) or (last_stochrsi_k_1h < 80.0) or (last_stochrsi_k_4h < 90.0))
+      and ((last_aroonu_14_15m < 100.0) or (last_aroonu_14_1h < 100.0))
+      and ((last_aroonu_14_15m < 100.0) or (last_aroonu_14_4h < 100.0))
+      and ((last_aroonu_14_15m < 100.0) or (last_aroonu_14_1d < 100.0))
+      and ((last_aroonu_14_15m < 100.0) or (last_stochrsi_k_1h < 80.0))
+      and ((last_aroonu_14_4h < 70.0) or (last_roc_9_1d < 50.0))
+      and ((last_stochrsi_k_15m < 80.0) or (last_stochrsi_k_1h < 90.0))
+      and ((last_stochrsi_k_15m < 90.0) or (last_aroonu_14_1h < 100.0))
+      and ((last_stochrsi_k_15m < 90.0) or (last_stochrsi_k_4h < 90.0))
+      and ((last_stochrsi_k_1h < 90.0) or (last_stochrsi_k_4h < 90.0))
+    ):
+      self._grind_entry_tag = "g23"
       return True
 
     self._grind_entry_tag = ""
@@ -46507,7 +46787,7 @@ class NostalgiaForInfinityX7(IStrategy):
     #   if grind_profit_rate < (max_profit_rate - 0.055):
     #     is_trailing_exit = True
     # is_trailing_exit = grind_profit_rate > 0.04
-
+    stake_fmt = ".8f" if self.config["stake_currency"] in ("BTC", "ETH", "BNB", "SOL") else ".3f"
     if is_normal_exit or is_trailing_exit:
       exit_amount = grind_total_amount * exit_rate / trade.leverage
       if ((current_stake_amount / trade.leverage) - exit_amount) < (min_stake * 1.55):
@@ -46530,7 +46810,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding exit ({name}) [{current_time}] [{trade.pair}] | Rate: {exit_rate} | Stake amount: {exit_amount} | Coin amount: {grind_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit_rate * 100.0):.2f}% ({grind_profit_stake} {self.config['stake_currency']})"
+          f"Grinding exit ({name}) [{current_time}] [{trade.pair}] | Rate: {exit_rate} | Stake amount: {exit_amount:{stake_fmt}} | Coin amount: {grind_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit_rate * 100.0):.2f}% ({grind_profit_stake:{stake_fmt}} {self.config['stake_currency']})"
         )
         order_tag = tag
         for grind_entry in grind_open_orders:
@@ -47179,7 +47459,7 @@ class NostalgiaForInfinityX7(IStrategy):
       + grind_5_total_amount
       + grind_6_total_amount
     )
-
+    stake_fmt = ".8f" if self.config["stake_currency"] in ("BTC", "ETH", "BNB", "SOL") else ".3f"
     # Sell remaining if partial fill on exit
     if partial_sell:
       order = filled_exits[-1]
@@ -47189,7 +47469,7 @@ class NostalgiaForInfinityX7(IStrategy):
       ft_sell_amount = sell_amount * trade_leverage * (trade_stake_amount / trade_amount) / exit_rate
       if sell_amount > min_stake and ft_sell_amount > min_stake:
         send_msg(
-          f"Exit (remaining) [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {order.safe_remaining} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+          f"Exit (remaining) [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {order.safe_remaining} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
         )
         order_tag = "p"
         if has_order_tags:
@@ -47248,7 +47528,7 @@ class NostalgiaForInfinityX7(IStrategy):
               )
             )
             log.info(
-              f"Grinding exit (gm0) [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {coin_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+              f"Grinding exit (gm0) [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {coin_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
             )
             order_tag = "gm0"
             for grind_entry_id in grind_1_buy_orders:
@@ -47289,7 +47569,7 @@ class NostalgiaForInfinityX7(IStrategy):
               )
             )
             log.info(
-              f"Grinding de-risk (gmd0) [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {coin_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+              f"Grinding de-risk (gmd0) [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {coin_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
             )
             order_tag = "gmd0"
             for grind_entry_id in grind_1_buy_orders:
@@ -47299,7 +47579,9 @@ class NostalgiaForInfinityX7(IStrategy):
             else:
               return -ft_sell_amount
 
-    is_long_grind_entry = self.long_grind_entry(last_candle, previous_candle, slice_profit, True)
+    is_long_grind_entry = self.long_grind_entry_v3(
+      last_candle, previous_candle, num_open_grinds, slice_profit, slice_profit_entry, slice_profit_exit, True
+    )  # 120 grinds via the v3 entry set (g0..g23) instead of the legacy grind mode
     slice_profit_lt_neg_0_06 = slice_profit < -0.06
     num_open_grinds_eq_0 = num_open_grinds == 0
 
@@ -47356,7 +47638,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding entry (dl1) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_1_derisk_1_current_grind_stake_profit} {stake_currency})"
+          f"Grinding entry (dl1) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_1_derisk_1_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
         )
         order_tag = "dl1"
         if has_order_tags:
@@ -47389,7 +47671,7 @@ class NostalgiaForInfinityX7(IStrategy):
             )
           )
           log.info(
-            f"Grinding exit (dl1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_1_derisk_1_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+            f"Grinding exit (dl1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_1_derisk_1_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
           )
           order_tag = "dl1"
           for grind_entry_id in grind_1_derisk_1_buy_orders:
@@ -47440,7 +47722,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding stop exit (ddl1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_1_derisk_1_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
+          f"Grinding stop exit (ddl1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_1_derisk_1_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
         )
         order_tag = "ddl1"
         for grind_entry_id in grind_1_derisk_1_buy_orders:
@@ -47503,7 +47785,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding entry (dl2) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_2_derisk_1_current_grind_stake_profit} {stake_currency})"
+          f"Grinding entry (dl2) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_2_derisk_1_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
         )
         order_tag = "dl2"
         if has_order_tags:
@@ -47536,7 +47818,7 @@ class NostalgiaForInfinityX7(IStrategy):
             )
           )
           log.info(
-            f"Grinding exit (dl2) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_2_derisk_1_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+            f"Grinding exit (dl2) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_2_derisk_1_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
           )
           order_tag = "dl2"
           for grind_entry_id in grind_2_derisk_1_buy_orders:
@@ -47587,7 +47869,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding stop exit (ddl2) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_2_derisk_1_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
+          f"Grinding stop exit (ddl2) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_2_derisk_1_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
         )
         order_tag = "ddl2"
         for grind_entry_id in grind_2_derisk_1_buy_orders:
@@ -47642,7 +47924,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding entry (gd1) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_1_current_grind_stake_profit} {stake_currency})"
+          f"Grinding entry (gd1) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_1_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
         )
         order_tag = "gd1"
         if has_order_tags:
@@ -47683,7 +47965,7 @@ class NostalgiaForInfinityX7(IStrategy):
         )
       )
       log.info(
-        f"Grinding entry (gd1) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_1_current_grind_stake_profit} {stake_currency})"
+        f"Grinding entry (gd1) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_1_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
       )
       order_tag = "gd1"
       if has_order_tags:
@@ -47716,7 +47998,7 @@ class NostalgiaForInfinityX7(IStrategy):
             )
           )
           log.info(
-            f"Grinding exit (gd1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_1_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+            f"Grinding exit (gd1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_1_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
           )
           order_tag = "gd1"
           for grind_entry_id in grind_1_buy_orders:
@@ -47766,7 +48048,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding stop exit (dd1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_1_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
+          f"Grinding stop exit (dd1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_1_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
         )
         order_tag = "dd1"
         for grind_entry_id in grind_1_buy_orders:
@@ -47821,7 +48103,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding entry (gd2) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_2_current_grind_stake_profit} {stake_currency})"
+          f"Grinding entry (gd2) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_2_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
         )
         order_tag = "gd2"
         if has_order_tags:
@@ -47854,7 +48136,7 @@ class NostalgiaForInfinityX7(IStrategy):
             )
           )
           log.info(
-            f"Grinding exit (gd2) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_2_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+            f"Grinding exit (gd2) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_2_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
           )
           order_tag = "gd2"
           for grind_entry_id in grind_2_buy_orders:
@@ -47904,7 +48186,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding stop exit (dd2) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_2_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
+          f"Grinding stop exit (dd2) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_2_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
         )
         order_tag = "dd2"
         for grind_entry_id in grind_2_buy_orders:
@@ -47959,7 +48241,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding entry (gd3) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_3_current_grind_stake_profit} {stake_currency})"
+          f"Grinding entry (gd3) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_3_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
         )
         order_tag = "gd3"
         if has_order_tags:
@@ -47992,7 +48274,7 @@ class NostalgiaForInfinityX7(IStrategy):
             )
           )
           log.info(
-            f"Grinding exit (gd3) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_3_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+            f"Grinding exit (gd3) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_3_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
           )
           order_tag = "gd3"
           for grind_entry_id in grind_3_buy_orders:
@@ -48042,7 +48324,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding stop exit (dd3) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_3_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
+          f"Grinding stop exit (dd3) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_3_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
         )
         order_tag = "dd3"
         for grind_entry_id in grind_3_buy_orders:
@@ -48097,7 +48379,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding entry (gd4) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_4_current_grind_stake_profit} {stake_currency})"
+          f"Grinding entry (gd4) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_4_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
         )
         order_tag = "gd4"
         if has_order_tags:
@@ -48130,7 +48412,7 @@ class NostalgiaForInfinityX7(IStrategy):
             )
           )
           log.info(
-            f"Grinding exit (gd4) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_4_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+            f"Grinding exit (gd4) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_4_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
           )
           order_tag = "gd4"
           for grind_entry_id in grind_4_buy_orders:
@@ -48180,7 +48462,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding stop exit (dd4) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_4_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
+          f"Grinding stop exit (dd4) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_4_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
         )
         order_tag = "dd4"
         for grind_entry_id in grind_4_buy_orders:
@@ -48235,7 +48517,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding entry (gd5) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_5_current_grind_stake_profit} {stake_currency})"
+          f"Grinding entry (gd5) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_5_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
         )
         order_tag = "gd5"
         if has_order_tags:
@@ -48268,7 +48550,7 @@ class NostalgiaForInfinityX7(IStrategy):
             )
           )
           log.info(
-            f"Grinding exit (gd5) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_5_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+            f"Grinding exit (gd5) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_5_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
           )
           order_tag = "gd5"
           for grind_entry_id in grind_5_buy_orders:
@@ -48318,7 +48600,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding stop exit (dd5) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_5_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
+          f"Grinding stop exit (dd5) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_5_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
         )
         order_tag = "dd5"
         for grind_entry_id in grind_5_buy_orders:
@@ -48373,7 +48655,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding entry (gd6) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_6_current_grind_stake_profit} {stake_currency})"
+          f"Grinding entry (gd6) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_6_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
         )
         order_tag = "gd6"
         if has_order_tags:
@@ -48406,7 +48688,7 @@ class NostalgiaForInfinityX7(IStrategy):
             )
           )
           log.info(
-            f"Grinding exit (gd6) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_6_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+            f"Grinding exit (gd6) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_6_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
           )
           order_tag = "gd6"
           for grind_entry_id in grind_6_buy_orders:
@@ -48456,7 +48738,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding stop exit (dd6) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_6_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
+          f"Grinding stop exit (dd6) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_6_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
         )
         order_tag = "dd6"
         for grind_entry_id in grind_6_buy_orders:
@@ -48518,7 +48800,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Re-entry (d1) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({derisk_1_current_grind_stake_profit} {stake_currency})"
+          f"Re-entry (d1) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({derisk_1_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
         )
         order_tag = "d1"
         if has_order_tags:
@@ -48558,7 +48840,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"De-risk (d1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+          f"De-risk (d1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
         )
         return -ft_sell_amount, "d1"
 
@@ -48584,10 +48866,10 @@ class NostalgiaForInfinityX7(IStrategy):
     #   if sell_amount > min_stake and ft_sell_amount > min_stake:
     #     grind_profit = 0.0
     #     self.dp.send_msg(
-    #       f"De-risk [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+    #       f"De-risk [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
     #     )
     #     log.info(
-    #       f"De-risk [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+    #       f"De-risk [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
     #     )
     #     return -ft_sell_amount, "d", is_derisk
 
@@ -48602,10 +48884,10 @@ class NostalgiaForInfinityX7(IStrategy):
     #   ft_sell_amount = sell_amount * trade.leverage * (trade.stake_amount / trade.amount) / exit_rate
     #   if sell_amount > min_stake and ft_sell_amount > min_stake:
     #     self.dp.send_msg(
-    #       f"De-risk (dd0) [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_1_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+    #       f"De-risk (dd0) [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_1_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
     #     )
     #     log.info(
-    #       f"De-risk (dd0) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_1_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+    #       f"De-risk (dd0) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_1_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
     #     )
     #     order_tag = "dd0"
     #     for grind_entry_id in (
@@ -50490,7 +50772,7 @@ class NostalgiaForInfinityX7(IStrategy):
       current_open_rate = total_cost / total_amount
       current_grind_stake = total_amount * exit_rate * (1 - trade.fee_close)
       current_grind_stake_profit = current_grind_stake - total_cost
-
+    stake_fmt = ".8f" if self.config["stake_currency"] in ("BTC", "ETH", "BNB", "SOL") else ".3f"
     if (not partial_sell) and (sub_grind_count < max_sub_grinds):
       if (
         ((0 <= sub_grind_count < max_sub_grinds) and (slice_profit_entry < rebuy_mode_sub_thresholds[sub_grind_count]))
@@ -50524,7 +50806,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Rebuy (r) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+          f"Rebuy (r) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
         )
         if has_order_tags:
           return buy_amount, "r"
@@ -50547,12 +50829,12 @@ class NostalgiaForInfinityX7(IStrategy):
           f"❌​​ ​**Rebuy De-risk:** `Level 3`\n"
           f"🪙​ **Pair:** `{trade_pair}`\n"
           f"〽️​ **Rate:** `{exit_rate}`\n"
-          f"💰 **Stake amount:** `{sell_amount}`\n"
-          f"💵​ **Profit (stake):** `{profit_stake}`\n"
+          f"💰 **Stake amount:** `{sell_amount:{stake_fmt}}`\n"
+          f"💵​ **Profit (stake):** `{profit_stake:{stake_fmt}}`\n"
           f"💸 **Profit (percent):** `{(profit_ratio * 100.0):.2f}%`"
         )
         log.info(
-          f"Rebuy De-risk Level 3 [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+          f"Rebuy De-risk Level 3 [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
         )
         if has_order_tags:
           return -ft_sell_amount, "derisk_level_3"
@@ -51559,7 +51841,7 @@ class NostalgiaForInfinityX7(IStrategy):
     if not sell:
       entry_cost = filled_entries[0].safe_filled * filled_entries[0].safe_price
       if is_system_v3_2:
-        if profit_stake < -(
+        if self.system_v3_2_stops_enable and profit_stake < -(
           entry_cost
           * (
             self.system_v3_2_stop_threshold_futures_rebuy
@@ -68148,9 +68430,12 @@ class NostalgiaForInfinityX7(IStrategy):
     grind_open_orders,
     trade: Trade,
   ) -> tuple:
-    # Short profit_rate = (exit - open) / open is NEGATIVE when profitable.
-    # Mirror of long with -grind_profit_rate (so the operator semantics stay symmetric).
-    if -grind_profit_rate < (grind_exit_profit_threshold + fee_open_rate + fee_close_rate):
+
+    # Normalize so profit is always positive when the short is profitable.
+    profit = -grind_profit_rate
+
+    # Not enough profit after fees.
+    if profit < (grind_exit_profit_threshold + fee_open_rate + fee_close_rate):
       return None, None
 
     last_rsi_3 = last_candle["RSI_3"]
@@ -68179,6 +68464,8 @@ class NostalgiaForInfinityX7(IStrategy):
       is_normal_exit = True
 
     is_trailing_exit = False
+    # max_profit = -max_profit_rate
+    # drawdown = max_profit - profit
     # if 0.01 <= -grind_profit_rate < 0.02:
     #   if -grind_profit_rate < (-max_profit_rate - 0.025):
     #     is_trailing_exit = True
@@ -68195,7 +68482,7 @@ class NostalgiaForInfinityX7(IStrategy):
     #   if -grind_profit_rate < (-max_profit_rate - 0.055):
     #     is_trailing_exit = True
     # is_trailing_exit = -grind_profit_rate > 0.04
-
+    stake_fmt = ".8f" if self.config["stake_currency"] in ("BTC", "ETH", "BNB", "SOL") else ".3f"
     if is_normal_exit or is_trailing_exit:
       exit_amount = grind_total_amount * exit_rate / trade.leverage
       if ((current_stake_amount / trade.leverage) - exit_amount) < (min_stake * 1.55):
@@ -68213,12 +68500,12 @@ class NostalgiaForInfinityX7(IStrategy):
             profit_ratio=profit_ratio,
             stake_currency=self.config["stake_currency"],
             grind_profit_stake=grind_profit_stake,
-            grind_profit_pct=grind_profit_rate,
+            grind_profit_pct=profit,
             coin_amount=grind_total_amount,
           )
         )
         log.info(
-          f"Grinding exit ({name}) [{current_time}] [{trade.pair}] | Rate: {exit_rate} | Stake amount: {exit_amount} | Coin amount: {grind_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit_rate * 100.0):.2f}% ({grind_profit_stake} {self.config['stake_currency']})"
+          f"Grinding exit ({name}) [{current_time}] [{trade.pair}] | Rate: {exit_rate} | Stake amount: {exit_amount:{stake_fmt}} | Coin amount: {grind_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(profit * 100.0):.2f}% ({grind_profit_stake:{stake_fmt}} {self.config['stake_currency']})"
         )
         order_tag = tag
         for grind_entry in grind_open_orders:
@@ -68760,7 +69047,7 @@ class NostalgiaForInfinityX7(IStrategy):
     # is_short_extra_checks_entry = True
     is_short_grind_entry = self.short_grind_entry_v3(last_candle, previous_candle, slice_profit, True)
     is_short_rebuy_entry = self.short_rebuy_entry_v3(last_candle, previous_candle, slice_profit, True)
-
+    stake_fmt = ".8f" if self.config["stake_currency"] in ("BTC", "ETH", "BNB", "SOL") else ".3f"
     # De-risk level 1
 
     if (
@@ -68826,7 +69113,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"De-risk Level 1 [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+          f"De-risk Level 1 [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
         )
         return -ft_sell_amount, "derisk_level_1"
 
@@ -68895,7 +69182,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"De-risk Level 2 [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+          f"De-risk Level 2 [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
         )
         return -ft_sell_amount, "derisk_level_2"
 
@@ -68964,7 +69251,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"De-risk Level 3 [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+          f"De-risk Level 3 [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
         )
         return -ft_sell_amount, "derisk_level_3"
 
@@ -68997,7 +69284,7 @@ class NostalgiaForInfinityX7(IStrategy):
         )
       )
       log.info(
-        f"Grinding entry (grind_1_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+        f"Grinding entry (grind_1_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Tag: {self._grind_entry_tag}"
       )
       order_tag = "grind_1_entry"
       if has_order_tags:
@@ -69071,7 +69358,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding de-risk (grind_1_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_1_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_1_current_grind_profit_stake} {stake_currency})"
+          f"Grinding de-risk (grind_1_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_1_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_1_current_grind_profit_stake:{stake_fmt}} {stake_currency})"
         )
         order_tag = "grind_1_derisk"
         for grind_entry_id in grind_1_buy_orders:
@@ -69110,7 +69397,7 @@ class NostalgiaForInfinityX7(IStrategy):
         )
       )
       log.info(
-        f"Grinding entry (grind_2_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+        f"Grinding entry (grind_2_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Tag: {self._grind_entry_tag}"
       )
       order_tag = "grind_2_entry"
       if has_order_tags:
@@ -69184,7 +69471,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding de-risk (grind_2_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_2_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_2_current_grind_profit_stake} {stake_currency})"
+          f"Grinding de-risk (grind_2_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_2_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_2_current_grind_profit_stake:{stake_fmt}} {stake_currency})"
         )
         order_tag = "grind_2_derisk"
         for grind_entry_id in grind_2_buy_orders:
@@ -69223,7 +69510,7 @@ class NostalgiaForInfinityX7(IStrategy):
         )
       )
       log.info(
-        f"Grinding entry (grind_3_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+        f"Grinding entry (grind_3_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Tag: {self._grind_entry_tag}"
       )
       order_tag = "grind_3_entry"
       if has_order_tags:
@@ -69297,7 +69584,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding de-risk (grind_3_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_3_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_3_current_grind_profit_stake} {stake_currency})"
+          f"Grinding de-risk (grind_3_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_3_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_3_current_grind_profit_stake:{stake_fmt}} {stake_currency})"
         )
         order_tag = "grind_3_derisk"
         for grind_entry_id in grind_3_buy_orders:
@@ -69352,7 +69639,7 @@ class NostalgiaForInfinityX7(IStrategy):
         )
       )
       log.info(
-        f"Grinding entry (grind_4_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+        f"Grinding entry (grind_4_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Tag: {self._grind_entry_tag}"
       )
       order_tag = "grind_4_entry"
       if has_order_tags:
@@ -69426,7 +69713,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding de-risk (grind_4_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_4_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_4_current_grind_profit_stake} {stake_currency})"
+          f"Grinding de-risk (grind_4_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_4_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_4_current_grind_profit_stake:{stake_fmt}} {stake_currency})"
         )
         order_tag = "grind_4_derisk"
         for grind_entry_id in grind_4_buy_orders:
@@ -69475,7 +69762,7 @@ class NostalgiaForInfinityX7(IStrategy):
         )
       )
       log.info(
-        f"Grinding entry (grind_5_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+        f"Grinding entry (grind_5_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Tag: {self._grind_entry_tag}"
       )
       order_tag = "grind_5_entry"
       if has_order_tags:
@@ -69549,7 +69836,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding de-risk (grind_5_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_5_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_5_current_grind_profit_stake} {stake_currency})"
+          f"Grinding de-risk (grind_5_derisk) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_5_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_5_current_grind_profit_stake:{stake_fmt}} {stake_currency})"
         )
         order_tag = "grind_5_derisk"
         for grind_entry_id in grind_5_buy_orders:
@@ -69588,7 +69875,7 @@ class NostalgiaForInfinityX7(IStrategy):
         )
       )
       log.info(
-        f"Rebuy (rebuy_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+        f"Rebuy (rebuy_entry) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
       )
       if has_order_tags:
         return buy_amount, "rebuy_entry"
@@ -69632,13 +69919,17 @@ class NostalgiaForInfinityX7(IStrategy):
     last_ema_200_4h = last_candle["EMA_200_4h"]
     last_aroond_14 = last_candle["AROOND_14"]
     last_aroond_14_15m = last_candle["AROOND_14_15m"]
+    last_aroond_14_1h = last_candle["AROOND_14_1h"]
     last_aroond_14_4h = last_candle["AROOND_14_4h"]
+    last_aroond_14_1d = last_candle["AROOND_14_1d"]
     last_roc_9_1h = last_candle["ROC_9_1h"]
     last_roc_9_4h = last_candle["ROC_9_4h"]
     last_roc_9_1d = last_candle["ROC_9_1d"]
     last_stochrsi_k = last_candle["STOCHRSIk_14_14_3_3"]
     last_stochrsik_15m = last_candle["STOCHRSIk_14_14_3_3_15m"]
     last_stochrsi_k_1h = last_candle["STOCHRSIk_14_14_3_3_1h"]
+    last_stochrsi_k_4h = last_candle["STOCHRSIk_14_14_3_3_4h"]
+    last_stochrsi_k_1d = last_candle["STOCHRSIk_14_14_3_3_1d"]
     last_willr_14 = last_candle["WILLR_14"]
     last_willr_84_1h = last_candle["WILLR_84_1h"]
     last_bbu = last_candle["BBU_20_2.0"]
@@ -69695,11 +69986,16 @@ class NostalgiaForInfinityX7(IStrategy):
       and (last_rsi_3_4h < 85.0)
       and (last_rsi_14 > 65.0)
       and (last_aroond_14_15m < 25.0)
+      and (last_stochrsik_15m > 30.0)
       and (last_stochrsi_k_1h > 10.0)
       and (last_roc_9_1h < 15.0)
       and (last_roc_9_4h < 15.0)
+      and ((last_rsi_3_1h < 80.0) or (last_rsi_3_1d < 80.0))
+      and ((last_rsi_3_4h < 70.0) or (last_stochrsi_k_4h > 40.0))
       and (last_close < (last_close_min_48 * 1.15))
       and (last_close > (last_ema_12 * 1.020))
+      and ((last_rsi_3_1h < 80.0) or (last_stochrsi_k_1d > 30.0))
+      and ((last_rsi_3_1h < 75.0) or (last_stochrsi_k_1h > 30.0))
     ):
       self._grind_entry_tag = "g3"
       return True
@@ -69744,6 +70040,7 @@ class NostalgiaForInfinityX7(IStrategy):
       and (last_roc_9_1h < 20.0)
       and (last_roc_9_4h < 20.0)
       and (last_aroond_14 < 25.0)
+      and ((last_aroond_14_1d < 100.0) or (last_roc_9_1d > -50.0))
       and (last_close > (last_high_max_12_4h * 0.40))
       and (last_rsi_20 > prev_rsi_20)
       and (last_close > (last_sma_16 * 1.040))
@@ -69850,10 +70147,13 @@ class NostalgiaForInfinityX7(IStrategy):
       and (last_aroond_14_15m < 50.0)
       and (last_stochrsi_k > 60.0)
       and (last_stochrsik_15m > 30.0)
+      and ((last_rsi_3_1h < 60.0) or (last_aroond_14_1h < 80.0))
       and (prev_sma_9 > prev_sma_21)
       and (last_sma_9 < last_sma_21)
       and (last_ema_12_4h < last_ema_200_4h)
       and (last_close < (last_close_min_48 * 1.10))
+      and ((last_rsi_3_1h < 70.0) or (last_stochrsi_k_1h > 30.0))
+      and ((last_rsi_3_1d < 75.0) or (last_stochrsi_k_1h > 20.0))
     ):
       self._grind_entry_tag = "g14"
       return True
@@ -69867,6 +70167,9 @@ class NostalgiaForInfinityX7(IStrategy):
       and (last_aroond_14_15m < 30.0)
       and (last_stochrsi_k > 70.0)
       and (last_stochrsik_15m > 70.0)
+      and ((last_rsi_3_1h < 70.0) or (last_stochrsi_k_1h > 20.0))
+      and ((last_rsi_3_4h < 70.0) or (last_stochrsi_k_4h > 20.0))
+      and ((last_rsi_3_1d < 70.0) or (last_stochrsi_k_1d > 20.0))
     ):
       self._grind_entry_tag = "g15"
       return True
@@ -69929,9 +70232,12 @@ class NostalgiaForInfinityX7(IStrategy):
       and (last_aroond_14 < 30.0)
       and (last_aroond_14_4h > 50.0)
       and (last_roc_9_1d < 15.0)
-      and (last_candle["STOCHRSIk_14_14_3_3_4h"] > 10.0)
+      and ((last_stochrsi_k_4h > 10.0) or (last_roc_9_4h > -30.0))
       and (last_ema_50_4h < last_ema_100_4h)
       and (last_close > (last_close_min_48 * 1.05))
+      and ((last_rsi_3_1h < 50.0) or (last_roc_9_1d > -60.0))
+      and ((last_rsi_3_4h < 60.0) or (last_aroond_14_4h < 90.0))
+      and ((last_rsi_3_4h < 55.0) or (last_aroond_14_4h < 100.0))
     ):
       self._grind_entry_tag = "g20"
       return True
@@ -69945,6 +70251,65 @@ class NostalgiaForInfinityX7(IStrategy):
       and (last_close > (last_ema_20 * 1.045))
     ):
       self._grind_entry_tag = "g21"
+      return True
+    # g22 — early breakdown rebuild: rejecting off the high BEFORE the 4h trend confirms (mirror long g22)
+    if (
+      (last_rsi_3 < 70.0)
+      and (last_rsi_3_15m < 70.0)
+      and (last_rsi_14 < 55.0)
+      and (last_rsi_14_1h < 55.0)
+      and (last_roc_9_1h < 0.0)
+      and (last_roc_9_4h < 10.0)
+      and (last_roc_9_4h > -25.0)
+      and (last_aroond_14_4h < 50.0)
+      and (last_close > last_ema_200_4h)
+      and (last_close < (last_high_max_12_4h * 0.90))
+      and (last_close < (last_ema_20 * 1.03))
+      and (last_close > (last_ema_20 * 0.98))
+      and ((last_rsi_3_4h < 50.0) or (last_aroond_14_1h < 100.0))
+      and ((last_rsi_3_1d < 90.0) or (last_aroond_14_1d < 70.0))
+      and ((last_rsi_3_1d < 60.0) or (last_stochrsi_k_1h > 20.0))
+      and ((last_rsi_3_1d < 60.0) or (last_stochrsi_k_4h > 20.0))
+      and ((last_rsi_3_1d < 55.0) or (last_aroond_14_1h < 100.0))
+      and ((last_rsi_3_1d < 55.0) or (last_aroond_14_4h < 100.0))
+      and ((last_rsi_3_1d < 55.0) or (last_stochrsi_k_1h > 10.0))
+      and ((last_rsi_3_1d < 55.0) or (last_stochrsi_k_4h > 10.0))
+      and ((last_aroond_14_15m < 80.0) or (last_stochrsik_15m > 20.0))
+      and ((last_roc_9_1d < 20.0) or (last_aroond_14_4h < 100.0))
+      and ((last_roc_9_1d < 20.0) or (last_stochrsi_k_4h > 10.0))
+      and ((last_roc_9_1d < 30.0) or (last_stochrsi_k_1h > 10.0))
+    ):
+      self._grind_entry_tag = "g22"
+      return True
+    # g23 — breakdown-continuation scalp: extended zone BELOW g22's EMA_20*0.98 cap (mirror long g23)
+    if (
+      (last_rsi_3 < 70.0)
+      and (last_rsi_3_15m < 70.0)
+      and (last_rsi_14 < 50.0)
+      and (last_rsi_14_1h < 50.0)
+      and (last_roc_9_1h < 0.0)
+      and (last_roc_9_4h < 0.0)
+      and (last_roc_9_4h > -25.0)
+      and ((last_stochrsi_k > 3.0) or (last_rsi_14 > 20.0))
+      and (last_close < (last_high_max_12_4h * 0.90))
+      and (last_close <= (last_ema_20 * 0.98))
+      and (last_close > (last_ema_20 * 0.88))
+      and ((last_rsi_3_4h < 50.0) or (last_aroond_14_4h < 70.0))
+      and ((last_rsi_3_1d < 85.0) or (last_stochrsi_k_1h > 20.0))
+      and ((last_rsi_3_1d < 70.0) or (last_aroond_14_1h < 100.0))
+      and ((last_rsi_3_1d < 70.0) or (last_aroond_14_4h < 100.0))
+      and ((last_rsi_3_1d < 50.0) or (last_stochrsi_k_1h > 20.0) or (last_stochrsi_k_4h > 10.0))
+      and ((last_aroond_14_15m < 100.0) or (last_aroond_14_1h < 100.0))
+      and ((last_aroond_14_15m < 100.0) or (last_aroond_14_4h < 100.0))
+      and ((last_aroond_14_15m < 100.0) or (last_aroond_14_1d < 100.0))
+      and ((last_aroond_14_15m < 100.0) or (last_stochrsi_k_1h > 20.0))
+      and ((last_aroond_14_4h < 70.0) or (last_roc_9_1d > -50.0))
+      and ((last_stochrsik_15m > 20.0) or (last_stochrsi_k_1h > 10.0))
+      and ((last_stochrsik_15m > 10.0) or (last_aroond_14_1h < 100.0))
+      and ((last_stochrsik_15m > 10.0) or (last_stochrsi_k_4h > 10.0))
+      and ((last_stochrsi_k_1h > 10.0) or (last_stochrsi_k_4h > 10.0))
+    ):
+      self._grind_entry_tag = "g23"
       return True
 
     self._grind_entry_tag = ""
@@ -70607,7 +70972,7 @@ class NostalgiaForInfinityX7(IStrategy):
       + grind_5_total_amount
       + grind_6_total_amount
     )
-
+    stake_fmt = ".8f" if self.config["stake_currency"] in ("BTC", "ETH", "BNB", "SOL") else ".3f"
     # Sell remaining if partial fill on exit
     if partial_sell:
       order = filled_exits[-1]
@@ -70617,7 +70982,7 @@ class NostalgiaForInfinityX7(IStrategy):
       ft_sell_amount = sell_amount * trade_leverage * (trade_stake_amount / trade_amount) / exit_rate
       if sell_amount > min_stake and ft_sell_amount > min_stake:
         send_msg(
-          f"Exit (remaining) [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {order.safe_remaining} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+          f"Exit (remaining) [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {order.safe_remaining} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
         )
         order_tag = "p"
         if has_order_tags:
@@ -70676,7 +71041,7 @@ class NostalgiaForInfinityX7(IStrategy):
               )
             )
             log.info(
-              f"Grinding exit (gm0) [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {coin_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+              f"Grinding exit (gm0) [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {coin_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
             )
             order_tag = "gm0"
             for grind_entry_id in grind_1_buy_orders:
@@ -70717,7 +71082,7 @@ class NostalgiaForInfinityX7(IStrategy):
               )
             )
             log.info(
-              f"Grinding de-risk (gmd0) [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {coin_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+              f"Grinding de-risk (gmd0) [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {coin_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
             )
             order_tag = "gmd0"
             for grind_entry_id in grind_1_buy_orders:
@@ -70782,7 +71147,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding entry (dl1) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_1_derisk_1_current_grind_stake_profit} {stake_currency})"
+          f"Grinding entry (dl1) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_1_derisk_1_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
         )
         order_tag = "dl1"
         if has_order_tags:
@@ -70815,7 +71180,7 @@ class NostalgiaForInfinityX7(IStrategy):
             )
           )
           log.info(
-            f"Grinding exit (dl1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_1_derisk_1_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+            f"Grinding exit (dl1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_1_derisk_1_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
           )
           order_tag = "dl1"
           for grind_entry_id in grind_1_derisk_1_buy_orders:
@@ -70866,7 +71231,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding stop exit (ddl1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_1_derisk_1_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
+          f"Grinding stop exit (ddl1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_1_derisk_1_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
         )
         order_tag = "ddl1"
         for grind_entry_id in grind_1_derisk_1_buy_orders:
@@ -70927,7 +71292,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding entry (dl2) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_2_derisk_1_current_grind_stake_profit} {stake_currency})"
+          f"Grinding entry (dl2) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_2_derisk_1_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
         )
         order_tag = "dl2"
         if has_order_tags:
@@ -70960,7 +71325,7 @@ class NostalgiaForInfinityX7(IStrategy):
             )
           )
           log.info(
-            f"Grinding exit (dl2) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_2_derisk_1_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+            f"Grinding exit (dl2) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_2_derisk_1_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
           )
           order_tag = "dl2"
           for grind_entry_id in grind_2_derisk_1_buy_orders:
@@ -71011,7 +71376,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding stop exit (ddl2) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_2_derisk_1_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
+          f"Grinding stop exit (ddl2) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_2_derisk_1_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
         )
         order_tag = "ddl2"
         for grind_entry_id in grind_2_derisk_1_buy_orders:
@@ -71064,7 +71429,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding entry (gd1) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_1_current_grind_stake_profit} {stake_currency})"
+          f"Grinding entry (gd1) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_1_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
         )
         order_tag = "gd1"
         if has_order_tags:
@@ -71105,7 +71470,7 @@ class NostalgiaForInfinityX7(IStrategy):
         )
       )
       log.info(
-        f"Grinding entry (gd1) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_1_current_grind_stake_profit} {stake_currency})"
+        f"Grinding entry (gd1) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_1_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
       )
       order_tag = "gd1"
       if has_order_tags:
@@ -71138,7 +71503,7 @@ class NostalgiaForInfinityX7(IStrategy):
             )
           )
           log.info(
-            f"Grinding exit (gd1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_1_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+            f"Grinding exit (gd1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_1_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
           )
           order_tag = "gd1"
           for grind_entry_id in grind_1_buy_orders:
@@ -71188,7 +71553,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding stop exit (dd1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_1_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
+          f"Grinding stop exit (dd1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_1_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
         )
         order_tag = "dd1"
         for grind_entry_id in grind_1_buy_orders:
@@ -71241,7 +71606,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding entry (gd2) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_2_current_grind_stake_profit} {stake_currency})"
+          f"Grinding entry (gd2) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_2_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
         )
         order_tag = "gd2"
         if has_order_tags:
@@ -71274,7 +71639,7 @@ class NostalgiaForInfinityX7(IStrategy):
             )
           )
           log.info(
-            f"Grinding exit (gd2) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_2_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+            f"Grinding exit (gd2) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_2_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
           )
           order_tag = "gd2"
           for grind_entry_id in grind_2_buy_orders:
@@ -71324,7 +71689,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding stop exit (dd2) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_2_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
+          f"Grinding stop exit (dd2) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_2_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
         )
         order_tag = "dd2"
         for grind_entry_id in grind_2_buy_orders:
@@ -71377,7 +71742,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding entry (gd3) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_3_current_grind_stake_profit} {stake_currency})"
+          f"Grinding entry (gd3) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_3_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
         )
         order_tag = "gd3"
         if has_order_tags:
@@ -71410,7 +71775,7 @@ class NostalgiaForInfinityX7(IStrategy):
             )
           )
           log.info(
-            f"Grinding exit (gd3) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_3_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+            f"Grinding exit (gd3) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_3_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
           )
           order_tag = "gd3"
           for grind_entry_id in grind_3_buy_orders:
@@ -71460,7 +71825,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding stop exit (dd3) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_3_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
+          f"Grinding stop exit (dd3) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_3_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
         )
         order_tag = "dd3"
         for grind_entry_id in grind_3_buy_orders:
@@ -71513,7 +71878,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding entry (gd4) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_4_current_grind_stake_profit} {stake_currency})"
+          f"Grinding entry (gd4) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_4_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
         )
         order_tag = "gd4"
         if has_order_tags:
@@ -71546,7 +71911,7 @@ class NostalgiaForInfinityX7(IStrategy):
             )
           )
           log.info(
-            f"Grinding exit (gd4) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_4_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+            f"Grinding exit (gd4) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_4_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
           )
           order_tag = "gd4"
           for grind_entry_id in grind_4_buy_orders:
@@ -71596,7 +71961,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding stop exit (dd4) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_4_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
+          f"Grinding stop exit (dd4) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_4_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
         )
         order_tag = "dd4"
         for grind_entry_id in grind_4_buy_orders:
@@ -71649,7 +72014,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding entry (gd5) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_5_current_grind_stake_profit} {stake_currency})"
+          f"Grinding entry (gd5) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_5_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
         )
         order_tag = "gd5"
         if has_order_tags:
@@ -71682,7 +72047,7 @@ class NostalgiaForInfinityX7(IStrategy):
             )
           )
           log.info(
-            f"Grinding exit (gd5) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_5_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+            f"Grinding exit (gd5) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_5_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
           )
           order_tag = "gd5"
           for grind_entry_id in grind_5_buy_orders:
@@ -71732,7 +72097,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding stop exit (dd5) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_5_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
+          f"Grinding stop exit (dd5) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_5_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
         )
         order_tag = "dd5"
         for grind_entry_id in grind_5_buy_orders:
@@ -71785,7 +72150,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding entry (gd6) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_6_current_grind_stake_profit} {stake_currency})"
+          f"Grinding entry (gd6) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_6_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
         )
         order_tag = "gd6"
         if has_order_tags:
@@ -71818,7 +72183,7 @@ class NostalgiaForInfinityX7(IStrategy):
             )
           )
           log.info(
-            f"Grinding exit (gd6) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_6_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage} {stake_currency})"
+            f"Grinding exit (gd6) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_6_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({grind_profit * sell_amount * trade_leverage:{stake_fmt}} {stake_currency})"
           )
           order_tag = "gd6"
           for grind_entry_id in grind_6_buy_orders:
@@ -71868,7 +72233,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Grinding stop exit (dd6) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Coin amount: {grind_6_total_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
+          f"Grinding stop exit (dd6) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Coin amount: {grind_6_total_amount} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}%"
         )
         order_tag = "dd6"
         for grind_entry_id in grind_6_buy_orders:
@@ -71928,7 +72293,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Re-entry (d1) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({derisk_1_current_grind_stake_profit} {stake_currency})"
+          f"Re-entry (d1) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}% | Grind profit: {(grind_profit * 100.0):.2f}% ({derisk_1_current_grind_stake_profit:{stake_fmt}} {stake_currency})"
         )
         order_tag = "d1"
         if has_order_tags:
@@ -71968,7 +72333,7 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"De-risk (d1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+          f"De-risk (d1) [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
         )
         return -ft_sell_amount, "d1"
 
@@ -73756,6 +74121,22 @@ class NostalgiaForInfinityX7(IStrategy):
 
     has_order_tags = hasattr(first_filled_order, "ft_order_tag")
 
+    # The first exit is de-risk (providing the trade is still open)
+    if (count_of_exits > 0) and (filled_exits[0].ft_order_tag == "derisk_level_3"):
+      return self.short_grind_adjust_trade_position_v3(
+        trade,
+        enter_tags,
+        current_time,
+        current_rate,
+        current_profit,
+        min_stake,
+        max_stake,
+        current_entry_rate,
+        current_exit_rate,
+        current_entry_profit,
+        current_exit_profit,
+      )
+
     if dp.runmode.value in ("live", "dry_run"):
       ticker = dp.ticker(trade_pair)
       if ("bid" in ticker) and ("ask" in ticker):
@@ -73810,7 +74191,7 @@ class NostalgiaForInfinityX7(IStrategy):
       current_open_rate = total_cost / total_amount
       current_grind_stake = total_amount * exit_rate * (1 - trade.fee_close)
       current_grind_stake_profit = current_grind_stake - total_cost
-
+    stake_fmt = ".8f" if self.config["stake_currency"] in ("BTC", "ETH", "BNB", "SOL") else ".3f"
     if (not partial_sell) and (sub_grind_count < max_sub_grinds):
       if (
         (
@@ -73844,12 +74225,40 @@ class NostalgiaForInfinityX7(IStrategy):
           )
         )
         log.info(
-          f"Rebuy (r) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount} | Profit (stake): {profit_stake} | Profit: {(profit_ratio * 100.0):.2f}%"
+          f"Rebuy (r) [{current_time}] [{trade_pair}] | Rate: {current_rate} | Stake amount: {buy_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
         )
         if has_order_tags:
           return buy_amount, "r"
         else:
           return buy_amount
+
+    if self.derisk_enable and (
+      profit_stake
+      < (
+        slice_amount
+        * (self.system_v3_rebuy_mode_derisk_futures if is_futures_mode else self.system_v3_rebuy_mode_derisk_spot)
+      )
+      / trade_leverage
+    ):
+      sell_amount = trade_amount * exit_rate / trade_leverage - (min_stake * 1.55)
+      ft_sell_amount = sell_amount * trade_leverage * (trade.stake_amount / trade_amount) / exit_rate
+      if sell_amount > min_stake and ft_sell_amount > min_stake:
+        grind_profit = 0.0
+        dp.send_msg(
+          f"❌​​ ​**Rebuy De-risk:** `Level 3`\n"
+          f"🪙​ **Pair:** `{trade_pair}`\n"
+          f"〽️​ **Rate:** `{exit_rate}`\n"
+          f"💰 **Stake amount:** `{sell_amount:{stake_fmt}}`\n"
+          f"💵​ **Profit (stake):** `{profit_stake:{stake_fmt}}`\n"
+          f"💸 **Profit (percent):** `{(profit_ratio * 100.0):.2f}%`"
+        )
+        log.info(
+          f"Rebuy De-risk Level 3 [{current_time}] [{trade_pair}] | Rate: {exit_rate} | Stake amount: {sell_amount:{stake_fmt}} | Profit (stake): {profit_stake:{stake_fmt}} | Profit: {(profit_ratio * 100.0):.2f}%"
+        )
+        if has_order_tags:
+          return -ft_sell_amount, "derisk_level_3"
+        else:
+          return -ft_sell_amount
 
     return None
 
