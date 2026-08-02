@@ -56,7 +56,8 @@
     "secret": "",
     "pair_whitelist": [],
     "pair_blacklist": [
-      "(BNB)/.*",
+      "(FIGHT|IDOL)/.*",
+      "(RIF|BNB)/.*",
       "(1000.*).*/.*",
       ".*(_PREMIUM|BEAR|BULL|HALF|HEDGE|UP|DOWN|[1235][SL])/.*",
       "(ARS|AUD|BIDR|BRZ|BRL|CAD|CHF|EUR|GBP|HKD|IDRT|JPY|NGN|PLN|RON|RUB|SGD|TRY|UAH|USD|ZAR)/.*",
