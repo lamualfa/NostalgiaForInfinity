@@ -1,12 +1,14 @@
 {
   "exchange": {
     "pair_blacklist": [
+      // FIGHT all-12 + IDOL (MEET48) — iterativ 2026-08-02
+      "(FIGHT|IDOL)/.*",
       // Exchange Tokens
       "BGB/.*",
       // Leverage tokens
       ".*(3L|3S|5L|5S|UP|DOWN)/.*",
       // Fiat
-      "(RIF|AUD|BRZ|CAD|CHF|EUR|GBP|HKD|IDRT|JPY|NGN|RUB|SGD|TRY|UAH|USD|ZAR)/.*",
+      "(RCCL|RTRV|RTXSTOCK|RIF|AUD|BRZ|CAD|CHF|EUR|GBP|HKD|IDRT|JPY|NGN|RUB|SGD|TRY|UAH|USD|ZAR)/.*",
       // Stable tokens
       "(BUSD|CUSD|CUSDT|DAI|SUSD|TUSD|USDC|USDN|USDP|USDT|VAI|UST|USDD|USDJ|USTC|AUSD|OUSD|FDUSD|EURI|USDS|XUSD|USD1|RLUSD|U)/.*",
       // FAN Tokens
