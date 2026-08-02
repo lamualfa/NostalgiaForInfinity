@@ -79,3 +79,32 @@ These remain identical to the NFI example config:
 - `process_throttle_secs`: `5`
 - `stoploss_on_exchange_interval`: `60`
 - `stoploss_on_exchange_limit_ratio`: `0.99`
+
+## Fork maintenance rules
+
+The `production` branch is kept a linear superset of `iterativv:main` via rebase
+(see the nfi-sync job in the parent `freqtrade-notifier` repo). Rebase replays
+this branch's commits on top of upstream — so **a commit that edits a file
+upstream also owns will conflict**, every time upstream touches that file.
+
+To keep rebases conflict-free, follow these rules for any change on `production`:
+
+1. **Never edit a file that exists in upstream.** All fork customizations live in
+   fork-exclusive files (listed below). If you need to diverge from an upstream
+   file, copy it to a new fork-exclusive filename and document the divergence in
+   `fork-env-example.env` or here.
+2. **Fork-exclusive files** (safe to edit — upstream does not have them):
+   - `config.production.json` *(the production freqtrade config)*
+   - `docker-compose.production.yml`
+   - `docker/Dockerfile.production`
+   - `docker/entrypoint.production.sh`
+   - `PRODUCTION_CONFIG.md` *(this file)*
+   - `fork-env-example.env` *(fork-specific env-var docs)*
+3. **Shared files** (upstream owns them — do NOT edit):
+   - `live-account-example.env` — fork env vars are documented in
+     `fork-env-example.env` instead.
+   - `configs/exampleconfig_secret.json`
+   - all strategy `.py` files, `configs/*.json`, etc.
+
+The nfi-sync job aborts (without pushing) if a rebase conflicts; resolving it
+manually once is fine, but the goal is zero conflicts by design.
