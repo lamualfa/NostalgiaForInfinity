@@ -21,6 +21,7 @@ services:
       - FREQTRADE__DRY_RUN=${FREQTRADE__DRY_RUN}
       - FREQTRADE__STRATEGY=${FREQTRADE__STRATEGY}
       - FREQTRADE__WEBHOOK__URL=${FREQTRADE__WEBHOOK__URL}
+      - TZ=${TZ}
     volumes:
       - freqtrade_user_data:/freqtrade/user_data
       - "./configs:/freqtrade/configs"
