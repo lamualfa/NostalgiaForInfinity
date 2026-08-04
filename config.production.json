@@ -152,7 +152,6 @@
   },
   "webhook": {
     "enabled": true,
-    "url": "https://freqtrade-notifier.lamualfa.dev/webhook/freqtrade",
     "webhookentry": {
       "type": "entry",
       "direction": "{direction}",
