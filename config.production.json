@@ -56,6 +56,7 @@
     "secret": "",
     "pair_whitelist": [],
     "pair_blacklist": [
+      "(LSK|STX)/.*",
       "(TUT)/.*",
       "(ACX|PIVX|VIC)/.*",
       "(FIGHT|IDOL)/.*",
