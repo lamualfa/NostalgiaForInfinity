@@ -56,7 +56,7 @@
     "secret": "",
     "pair_whitelist": [],
     "pair_blacklist": [
-      "(GLMR|ICX|MOVR|SOPH)/.*",
+      "(GLMR|ICX|MOVR|SOPH|SYN|COOKIE|DODO|DODOX|STORJ)/.*",
       "(LSK|STX)/.*",
       "(TUT)/.*",
       "(ACX|PIVX|VIC)/.*",
