@@ -21,6 +21,8 @@ services:
       - FREQTRADE__DRY_RUN=${FREQTRADE__DRY_RUN}
       - FREQTRADE__STRATEGY=${FREQTRADE__STRATEGY}
       - FREQTRADE__WEBHOOK__URL=${FREQTRADE__WEBHOOK__URL}?key=${FREQTRADE__WEBHOOK__API_KEY}
+      # freqtrade defaults to "form" (urlencoded); the notifier takes JSON natively.
+      - FREQTRADE__WEBHOOK__FORMAT=${FREQTRADE__WEBHOOK__FORMAT:-json}
       - TZ=${TZ}
     volumes:
       - freqtrade_user_data:/freqtrade/user_data
